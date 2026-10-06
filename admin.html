@@ -54,7 +54,8 @@
     <div class="flex flex-wrap gap-2 border-b border-cream-200 pb-4">
       <button onclick="switchTab('products')" id="tab-btn-products" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-terracotta-500 text-white shadow-sm">🧶 Manage Products & Stock</button>
       <button onclick="switchTab('orders')" id="tab-btn-orders" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">📦 Customer Orders</button>
-      <button onclick="switchTab('settings')" id="tab-btn-settings" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">⚙️ Store Settings & Offers</button>
+      <button onclick="switchTab('coupons')" id="tab-btn-coupons" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">🎟️ Discount Coupons</button>
+      <button onclick="switchTab('settings')" id="tab-btn-settings" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">⚙️ Store Settings & Banners</button>
     </div>
 
     <!-- TAB 1: PRODUCTS & STOCK MANAGEMENT -->
@@ -70,7 +71,6 @@
           </button>
         </div>
 
-        <!-- Products Grid -->
         <div id="admin-product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
       </div>
     </section>
@@ -84,12 +84,26 @@
       </div>
     </section>
 
-    <!-- TAB 3: SETTINGS & OFFERS -->
+    <!-- TAB 3: DISCOUNT COUPONS -->
+    <section id="tab-content-coupons" class="space-y-6 hidden">
+      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-serif font-bold text-xl text-stone-900 mb-1">Promo & Discount Codes</h2>
+            <p class="text-xs text-stone-500">Create and manage checkout coupons for your customers.</p>
+          </div>
+          <button onclick="openCouponModal()" class="bg-sage-500 hover:bg-sage-600 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition-all">➕ Create Coupon</button>
+        </div>
+        <div id="admin-coupons-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+      </div>
+    </section>
+
+    <!-- TAB 4: STORE SETTINGS & BANNERS -->
     <section id="tab-content-settings" class="space-y-6 hidden">
       <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs space-y-6">
         <div>
           <h2 class="font-serif font-bold text-xl text-stone-900 mb-1">Store Settings & WhatsApp Config</h2>
-          <p class="text-xs text-stone-500">Configure your storefront details and WhatsApp order routing number.</p>
+          <p class="text-xs text-stone-500">Configure your storefront details, headers, and WhatsApp order routing number.</p>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -108,8 +122,16 @@
             <label class="block text-xs font-semibold text-stone-600 mb-1">Top Announcement Banner Text</label>
             <input type="text" id="set-announcement" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
           </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Hero Section Main Title</label>
+            <input type="text" id="set-hero-title" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Hero Section Subtitle</label>
+            <input type="text" id="set-hero-subtitle" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          </div>
         </div>
-        <button onclick="saveStoreSettings()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold text-xs px-6 py-3 rounded-xl shadow-xs transition-all">Save Settings</button>
+        <button onclick="saveStoreSettings()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold text-xs px-6 py-3 rounded-xl shadow-xs transition-all">Save Store Settings</button>
       </div>
     </section>
 
@@ -177,6 +199,30 @@
     </div>
   </div>
 
+  <!-- COUPON MODAL -->
+  <div id="coupon-modal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 border border-cream-200 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-cream-200 pb-3">
+        <h3 class="font-serif font-bold text-lg text-stone-900">Create Coupon</h3>
+        <button onclick="closeCouponModal()" class="text-stone-400 hover:text-stone-800 text-xl font-bold">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 mb-1">Coupon Code</label>
+          <input type="text" id="coupon-code" placeholder="WELCOME10" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none uppercase font-bold">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 mb-1">Discount Percentage (%)</label>
+          <input type="number" id="coupon-discount" placeholder="10" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none">
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-cream-200">
+        <button onclick="closeCouponModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-sand-100 text-stone-600">Cancel</button>
+        <button onclick="saveCoupon()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-terracotta-500 text-white">Save Coupon</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ADMIN SCRIPT -->
   <script>
     const firebaseConfig = {
@@ -194,20 +240,27 @@
 
     let adminProducts = [];
     let adminOrders = [];
+    let adminCoupons = JSON.parse(localStorage.getItem('crochet_coupons')) || [
+      { code: 'WELCOME10', discount: 10 },
+      { code: 'CROCHET15', discount: 15 }
+    ];
     let adminSettings = JSON.parse(localStorage.getItem('crochet_settings')) || {
       shopName: "Artisan Crochet",
       tagline: "Handmade Studio",
       whatsappNumber: "919876543210",
-      announcementBanner: "✨ Free Shipping on orders over ₹1,499 | Handcrafted with Love in India ✨"
+      announcementBanner: "✨ Free Shipping on orders over ₹1,499 | Handcrafted with Love in India ✨",
+      heroTitle: "Handcrafted Crochet Art, Made for You",
+      heroSubtitle: "Discover exquisite handmade bouquets, plushies, and bags crafted with meticulous detail and premium yarn."
     };
 
     document.addEventListener("DOMContentLoaded", async () => {
       loadSettingsUI();
+      renderCoupons();
       await fetchAdminData();
     });
 
     function switchTab(tabName) {
-      ['products', 'orders', 'settings'].forEach(t => {
+      ['products', 'orders', 'coupons', 'settings'].forEach(t => {
         document.getElementById(`tab-content-${t}`).classList.add('hidden');
         document.getElementById(`tab-btn-${t}`).className = "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200";
       });
@@ -216,7 +269,6 @@
     }
 
     async function fetchAdminData() {
-      // Fetch Products from Firestore
       try {
         const prodSnap = await db.collection("products").get();
         adminProducts = [];
@@ -226,7 +278,6 @@
         console.error("Error fetching products:", err);
       }
 
-      // Fetch Orders from Firestore
       try {
         const orderSnap = await db.collection("orders").orderBy("createdAt", "desc").get();
         adminOrders = [];
@@ -276,7 +327,6 @@
       }).join('');
     }
 
-    // Toggle stock instantly from admin grid card
     async function toggleStockStatus(productId, newStockState) {
       try {
         await db.collection("products").doc(productId).update({ inStock: newStockState });
@@ -327,6 +377,42 @@
           </div>
         </div>
       `).join('');
+    }
+
+    function renderCoupons() {
+      const container = document.getElementById('admin-coupons-list');
+      if (adminCoupons.length === 0) {
+        container.innerHTML = `<p class="text-xs text-stone-400 col-span-full">No coupons created yet.</p>`;
+        return;
+      }
+      container.innerHTML = adminCoupons.map((c, index) => `
+        <div class="bg-sand-100 p-4 rounded-2xl border border-cream-200 flex items-center justify-between">
+          <div>
+            <span class="font-bold text-sm text-stone-900 uppercase">${c.code}</span>
+            <span class="text-xs text-sage-600 block font-semibold">${c.discount}% OFF</span>
+          </div>
+          <button onclick="deleteCoupon(${index})" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 bg-red-50 rounded-lg">Delete</button>
+        </div>
+      `).join('');
+    }
+
+    function openCouponModal() { document.getElementById('coupon-modal').classList.remove('hidden'); }
+    function closeCouponModal() { document.getElementById('coupon-modal').classList.add('hidden'); }
+
+    function saveCoupon() {
+      const code = document.getElementById('coupon-code').value.trim().toUpperCase();
+      const discount = Number(document.getElementById('coupon-discount').value);
+      if(!code || !discount) { alert("Please enter both code and discount."); return; }
+      adminCoupons.push({ code, discount });
+      localStorage.setItem('crochet_coupons', JSON.stringify(adminCoupons));
+      closeCouponModal();
+      renderCoupons();
+    }
+
+    function deleteCoupon(index) {
+      adminCoupons.splice(index, 1);
+      localStorage.setItem('crochet_coupons', JSON.stringify(adminCoupons));
+      renderCoupons();
     }
 
     function openProductModal() {
@@ -411,6 +497,8 @@
       document.getElementById('set-tagline').value = adminSettings.tagline || "";
       document.getElementById('set-whatsapp').value = adminSettings.whatsappNumber || "";
       document.getElementById('set-announcement').value = adminSettings.announcementBanner || "";
+      document.getElementById('set-hero-title').value = adminSettings.heroTitle || "";
+      document.getElementById('set-hero-subtitle').value = adminSettings.heroSubtitle || "";
     }
 
     function saveStoreSettings() {
@@ -418,6 +506,8 @@
       adminSettings.tagline = document.getElementById('set-tagline').value;
       adminSettings.whatsappNumber = document.getElementById('set-whatsapp').value;
       adminSettings.announcementBanner = document.getElementById('set-announcement').value;
+      adminSettings.heroTitle = document.getElementById('set-hero-title').value;
+      adminSettings.heroSubtitle = document.getElementById('set-hero-subtitle').value;
       localStorage.setItem('crochet_settings', JSON.stringify(adminSettings));
       alert("Store settings saved successfully!");
     }
