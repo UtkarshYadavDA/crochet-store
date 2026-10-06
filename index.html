@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Artisan Crochet Studio | Handcrafted with Love</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: { 50: '#FAF6F0', 100: '#F4EFE6', 200: '#E8DFD1' },
+            terracotta: { 500: '#C86D51', 600: '#B0593E' },
+            sage: { 500: '#728C69', 600: '#5C7353' },
+            sand: { 100: '#FFFDF9', 200: '#F5EFEB' }
+          },
+          fontFamily: {
+            serif: ['Playfair Display', 'serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-cream-50 font-sans text-stone-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Top Announcement Bar -->
+  <div class="bg-terracotta-500 text-white text-xs sm:text-sm font-medium py-2 text-center tracking-wide px-4">
+    <p id="top-announcement-text">✨ Free Shipping on orders over ₹1,499 | Handcrafted with Love in India ✨</p>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-30 bg-cream-50/90 backdrop-blur-md border-b border-cream-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2">
+        <span class="text-2xl">🧶</span>
+        <div>
+          <h1 id="shop-name-header" class="font-serif font-bold text-xl sm:text-2xl tracking-tight text-stone-900 leading-none">Artisan Crochet</h1>
+          <p id="shop-tagline-header" class="text-[10px] text-stone-500 uppercase tracking-widest font-medium mt-0.5">Handmade Studio</p>
+        </div>
+      </a>
+
+      <!-- Cart Button -->
+      <button onclick="toggleCart()" class="relative bg-sand-100 hover:bg-sand-200 text-stone-800 border border-cream-200 px-4 py-2 rounded-full font-medium text-sm transition-all duration-200 flex items-center gap-2 shadow-sm">
+        <span>🛒</span>
+        <span>Cart</span>
+        <span id="cart-count-badge" class="bg-terracotta-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-sand-100 border-b border-cream-200 py-10 sm:py-14 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <span class="inline-block bg-sage-500/10 text-sage-600 font-semibold text-xs px-3 py-1 rounded-full uppercase tracking-wider mb-3 border border-sage-500/20">Slow Fashion & Decor</span>
+      <h2 id="hero-title" class="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-stone-900 mb-3 leading-tight">
+        Handmade Crochet, Crafted for Your Aesthetic
+      </h2>
+      <p id="hero-desc" class="text-stone-600 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mb-6">
+        Discover sustainable, handmade crochet bags, everlasting flower bouquets, plushies, and custom wear.
+      </p>
+      
+      <!-- Sleek Timer Bar -->
+      <div id="flash-sale-timer-card" class="max-w-md mx-auto bg-white border border-terracotta-500/30 rounded-2xl p-3 shadow-xs mb-6 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2 text-left min-w-0">
+          <span class="text-xl animate-pulse">⚡</span>
+          <div>
+            <p id="timer-banner-title" class="text-xs font-bold text-stone-900 truncate">Flash Artisan Sale Ends In:</p>
+            <p class="text-[10px] text-stone-500">Grab limited stock before prices reset.</p>
+          </div>
+        </div>
+        <div id="countdown-clock" class="flex items-center gap-1 text-xs font-bold text-white bg-terracotta-500 px-3 py-1.5 rounded-xl shadow-2xs flex-shrink-0">
+          <span>00h</span> : <span>00m</span> : <span>00s</span>
+        </div>
+      </div>
+
+      <!-- Quick Search Bar -->
+      <div class="max-w-md mx-auto relative">
+        <input type="text" id="search-input" onkeyup="filterProducts()" placeholder="Search flowers, bags, plushies..." class="w-full bg-white border border-cream-200 rounded-full py-3 px-5 text-sm focus:outline-none focus:ring-2 focus:ring-terracotta-500 shadow-sm text-stone-800">
+        <span class="absolute right-4 top-3 text-stone-400">🔍</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Active Offers Banner Showcase -->
+  <div id="active-offers-showcase" class="max-w-6xl mx-auto px-4 sm:px-6 pt-6"></div>
+
+  <!-- Main Content & Catalog -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full">
+    
+    <!-- Category Tabs -->
+    <div id="category-container" class="flex flex-wrap items-center justify-center gap-2 mb-8"></div>
+
+    <!-- Product Grid -->
+    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+    <!-- Empty Search State -->
+    <div id="empty-state" class="hidden text-center py-16">
+      <p class="text-4xl mb-3">🌸</p>
+      <h3 class="font-serif font-bold text-lg text-stone-800">No items found</h3>
+      <p class="text-stone-500 text-sm mt-1">Try searching for something else or browse all categories.</p>
+    </div>
+  </main>
+
+  <!-- Cart Drawer Overlay -->
+  <div id="cart-drawer-overlay" onclick="toggleCart()" class="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-40 hidden transition-opacity"></div>
+
+  <!-- Cart Drawer -->
+  <div id="cart-drawer" class="fixed right-0 top-0 bottom-0 w-full max-w-md bg-sand-100 z-50 shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    <div class="p-5 border-b border-cream-200 flex items-center justify-between bg-white">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">🛍️</span>
+        <h3 class="font-serif font-bold text-lg text-stone-900">Your Order Bag</h3>
+      </div>
+      <button onclick="toggleCart()" class="text-stone-400 hover:text-stone-800 p-1 text-xl">✕</button>
+    </div>
+
+    <!-- Cart Items Container -->
+    <div id="cart-items-list" class="flex-grow overflow-y-auto p-5 space-y-4"></div>
+
+    <!-- Cart Footer & Customer Details Form -->
+    <div class="p-5 border-t border-cream-200 bg-white space-y-3">
+      <div id="cart-offer-notice" class="hidden bg-sage-50 border border-sage-500/30 p-2.5 rounded-xl text-xs text-sage-700 font-medium flex items-center gap-2">
+        <span>🎉</span>
+        <span id="cart-offer-text">Bundle offer applied successfully!</span>
+      </div>
+
+      <div class="space-y-1 text-sm">
+        <div id="subtotal-row" class="flex justify-between items-center text-stone-500 text-xs">
+          <span>Subtotal</span>
+          <span id="cart-subtotal-price">₹0</span>
+        </div>
+        <div id="discount-row" class="flex justify-between items-center text-terracotta-600 text-xs font-semibold hidden">
+          <span>Bundle Discount</span>
+          <span id="cart-discount-price">-₹0</span>
+        </div>
+        <div class="flex justify-between items-center font-semibold text-stone-800 pt-1 border-t border-cream-200">
+          <span>Estimated Total</span>
+          <span id="cart-total-price" class="text-xl font-serif text-terracotta-500 font-bold">₹0</span>
+        </div>
+      </div>
+
+      <!-- Customer Details Form -->
+      <div class="space-y-2.5 pt-1">
+        <input type="text" id="cust-name" placeholder="Your Full Name *" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 focus:ring-1 focus:ring-terracotta-500 outline-none">
+        <input type="tel" id="cust-phone" placeholder="WhatsApp Phone Number *" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 focus:ring-1 focus:ring-terracotta-500 outline-none">
+        <textarea id="cust-address" rows="2" placeholder="Delivery Address & City *" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 focus:ring-1 focus:ring-terracotta-500 outline-none"></textarea>
+      </div>
+
+      <button onclick="sendOrderToWhatsApp()" class="w-full bg-sage-500 hover:bg-sage-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-all duration-200 flex items-center justify-center gap-2">
+        <span>📱</span>
+        <span>Send Order to WhatsApp</span>
+      </button>
+      <p class="text-[10px] text-center text-stone-400">Order details will open in WhatsApp. Final confirmation & payment happen in chat!</p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-stone-900 text-stone-300 text-sm py-10 mt-12 border-t border-stone-800">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 text-center space-y-4">
+      <h3 id="shop-name-footer" class="font-serif font-bold text-xl text-white">Artisan Crochet Studio</h3>
+      <p id="shop-desc-footer" class="text-stone-400 text-xs max-w-sm mx-auto leading-relaxed">
+        Sustainable, hand-stitched crochet fashion and home decor made with love in India.
+      </p>
+      <div class="pt-4 border-t border-stone-800 text-stone-500 text-xs">
+        © <script>document.write(new Date().getFullYear())</script> All Rights Reserved. Handmade Studio.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Logic JavaScript -->
+  <script>
+    const defaultProducts = [
+      {
+        id: "p1",
+        title: "Eternal Tulip Bouquet (3 Stems)",
+        category: "Bouquets",
+        price: 699,
+        originalPrice: 1499,
+        sizes: "Standard, Large (5 Stems)",
+        image: "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?w=600&auto=format&fit=crop&q=80",
+        badge: "Limited Offer",
+        description: "Handcrafted soft milk cotton tulips that last forever. Perfect for gifts!"
+      },
+      {
+        id: "p2",
+        title: "Checkerboard Pastel Tote Bag",
+        category: "Bags",
+        price: 999,
+        originalPrice: 1699,
+        sizes: "Small, Medium, Large",
+        image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&auto=format&fit=crop&q=80",
+        badge: "Trending",
+        description: "Spacious aesthetic tote bag woven with sturdy comb cotton yarn."
+      }
+    ];
+
+    const defaultCategories = ["Bouquets", "Bags", "Amigurumi", "Wearables", "Home Decor"];
+    const defaultOffers = [
+      { id: "offer_1", minQty: 5, bundlePrice: 1499, title: "5 Items Combo Offer", description: "Add any 5 items to your bag and get them for just ₹1,499!" }
+    ];
+    const defaultSettings = {
+      shopName: "Artisan Crochet",
+      tagline: "Handmade Studio",
+      announcementBanner: "✨ Free Shipping on orders over ₹1,499 | Handcrafted with Love in India ✨",
+      whatsappNumber: "919876543210",
+      heroTitle: "Handmade Crochet, Crafted for Your Aesthetic",
+      heroDesc: "Discover sustainable, handmade crochet bags, everlasting flower bouquets, plushies, and custom wear.",
+      timerEnabled: true,
+      timerTitle: "Flash Artisan Sale Ends In:",
+      timerEndDate: new Date(Date.now() + 48 * 3600 * 1000).toISOString()
+    };
+
+    let products = JSON.parse(localStorage.getItem('crochet_products')) || defaultProducts;
+    let categoriesList = JSON.parse(localStorage.getItem('crochet_categories')) || defaultCategories;
+    let offersList = JSON.parse(localStorage.getItem('crochet_offers')) || defaultOffers;
+    let settings = JSON.parse(localStorage.getItem('crochet_settings')) || defaultSettings;
+    let cart = JSON.parse(localStorage.getItem('crochet_cart')) || [];
+    let selectedCategory = "All";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      applySettings();
+      initCountdownTimer();
+      renderOffersShowcase();
+      renderCategories();
+      renderProducts();
+      updateCartUI();
+    });
+
+    function applySettings() {
+      document.getElementById('shop-name-header').innerText = settings.shopName || "Artisan Crochet";
+      document.getElementById('shop-tagline-header').innerText = settings.tagline || "Handmade Studio";
+      document.getElementById('shop-name-footer').innerText = (settings.shopName || "Artisan Crochet") + " Studio";
+      document.getElementById('top-announcement-text').innerText = settings.announcementBanner || "✨ Free Shipping on orders over ₹1,499 | Handcrafted with Love in India ✨";
+      document.getElementById('hero-title').innerText = settings.heroTitle || "Handmade Crochet, Crafted for Your Aesthetic";
+      document.getElementById('hero-desc').innerText = settings.heroDesc || "Discover sustainable, handmade crochet bags, everlasting flower bouquets, plushies, and custom wear.";
+      
+      const timerCard = document.getElementById('flash-sale-timer-card');
+      if (settings.timerEnabled !== false && settings.timerEndDate) {
+        timerCard.classList.remove('hidden');
+        document.getElementById('timer-banner-title').innerText = settings.timerTitle || "Flash Artisan Sale Ends In:";
+      } else {
+        timerCard.classList.add('hidden');
+      }
+    }
+
+    function initCountdownTimer() {
+      const endDateStr = settings.timerEndDate || new Date(Date.now() + 48 * 3600 * 1000).toISOString();
+      const countDownDate = new Date(endDateStr).getTime();
+
+      setInterval(() => {
+        const now = new Date().getTime();
+        const distance = countDownDate - now;
+        if (distance < 0) { document.getElementById('countdown-clock').innerText = "SALE ENDED"; return; }
+
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById('countdown-clock').innerHTML = `
+          <span>${String(hours).padStart(2, '0')}h</span> :
+          <span>${String(minutes).padStart(2, '0')}m</span> :
+          <span>${String(seconds).padStart(2, '0')}s</span>
+        `;
+      }, 1000);
+    }
+
+    function renderOffersShowcase() {
+      const showcase = document.getElementById('active-offers-showcase');
+      if (!offersList || offersList.length === 0) { showcase.innerHTML = ''; return; }
+      showcase.innerHTML = `
+        <div class="bg-gradient-to-r from-terracotta-500/10 via-sage-500/10 to-terracotta-500/10 border border-cream-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+          <div class="flex items-center gap-3 text-center sm:text-left">
+            <span class="text-3xl">🎁</span>
+            <div>
+              <h3 class="font-serif font-bold text-sm sm:text-base text-stone-900">Special Bundle Offers Active!</h3>
+              <p class="text-xs text-stone-600 mt-0.5">Add matching item counts to your bag to unlock automatic cart discounts.</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 justify-center">
+            ${offersList.map(o => `
+              <div class="bg-white px-3 py-1.5 rounded-xl border border-cream-200 text-xs shadow-2xs text-stone-800">
+                🔥 <span class="font-bold text-terracotta-600">Buy ${o.minQty}+ for ₹${o.bundlePrice}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCategories() {
+      const allCatOptions = ["All", ...categoriesList];
+      const container = document.getElementById('category-container');
+      container.innerHTML = allCatOptions.map(cat => `
+        <button onclick="setCategory('${cat}')" class="px-4 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${
+          selectedCategory === cat ? 'bg-terracotta-500 text-white shadow-sm' : 'bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200'
+        }">${cat}</button>
+      `).join('');
+    }
+
+    function setCategory(category) {
+      selectedCategory = category;
+      renderCategories();
+      renderProducts();
+    }
+
+    function renderProducts() {
+      const searchTerm = document.getElementById('search-input').value.toLowerCase();
+      const grid = document.getElementById('product-grid');
+      const emptyState = document.getElementById('empty-state');
+
+      const filtered = products.filter(p => {
+        const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
+        const matchesSearch = p.title.toLowerCase().includes(searchTerm) || p.description.toLowerCase().includes(searchTerm);
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) { grid.innerHTML = ''; emptyState.classList.remove('hidden'); return; }
+
+      emptyState.classList.add('hidden');
+      grid.innerHTML = filtered.map(p => {
+        const hasDiscount = p.originalPrice && p.originalPrice > p.price;
+        const discountPercent = hasDiscount ? Math.round(((p.originalPrice - p.price) / p.originalPrice) * 100) : 0;
+        const sizeArr = p.sizes ? p.sizes.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+        return `
+          <div class="bg-sand-100 rounded-2xl overflow-hidden border border-cream-200 hover:shadow-lg transition-all duration-300 flex flex-col group">
+            <div class="relative h-56 sm:h-64 overflow-hidden bg-cream-100">
+              <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+              ${p.badge ? `<span class="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-stone-800 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs">${p.badge}</span>` : ''}
+              ${hasDiscount ? `<span class="absolute top-3 right-3 bg-terracotta-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-xs">${discountPercent}% OFF</span>` : ''}
+            </div>
+            <div class="p-5 flex flex-col flex-grow">
+              <span class="text-[10px] font-semibold text-sage-600 uppercase tracking-widest mb-1">${p.category}</span>
+              <h3 class="font-serif font-bold text-base text-stone-900 mb-1 leading-snug">${p.title}</h3>
+              <p class="text-stone-500 text-xs leading-relaxed mb-3 flex-grow">${p.description}</p>
+              
+              ${sizeArr.length > 0 ? `
+                <div class="mb-4">
+                  <label class="block text-[10px] font-semibold text-stone-500 uppercase tracking-wider mb-1">Select Size:</label>
+                  <select id="size-select-${p.id}" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-2.5 outline-none text-stone-800 focus:ring-1 focus:ring-terracotta-500">
+                    ${sizeArr.map(s => `<option value="${s}">${s}</option>`).join('')}
+                  </select>
+                </div>
+              ` : ''}
+
+              <div class="flex items-center justify-between pt-3 border-t border-cream-200">
+                <div class="flex items-baseline gap-2">
+                  <span class="font-serif font-bold text-lg text-stone-900">₹${p.price}</span>
+                  ${hasDiscount ? `<span class="text-xs text-stone-400 line-through">₹${p.originalPrice}</span>` : ''}
+                </div>
+                <button onclick="addToCartWithSelectedSize('${p.id}')" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-medium text-xs px-4 py-2 rounded-xl transition-colors duration-200 shadow-xs flex items-center gap-1.5">
+                  <span>+ Add to Bag</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterProducts() { renderProducts(); }
+
+    function addToCartWithSelectedSize(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+
+      let selectedSize = "Standard";
+      const sizeEl = document.getElementById(`size-select-${productId}`);
+      if (sizeEl) {
+        selectedSize = sizeEl.value;
+      }
+
+      // Check if exact product + size already in cart
+      const cartItemKey = productId + "_" + selectedSize;
+      const existing = cart.find(item => (item.id + "_" + (item.size || "Standard")) === cartItemKey);
+
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ ...product, size: selectedSize, qty: 1 });
+      }
+
+      saveCart();
+      updateCartUI();
+      toggleCart(true);
+    }
+
+    function updateQuantity(cartKey, delta) {
+      const item = cart.find(i => (i.id + "_" + (i.size || "Standard")) === cartKey);
+      if (!item) return;
+
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(i => (i.id + "_" + (i.size || "Standard")) !== cartKey);
+      }
+
+      saveCart();
+      updateCartUI();
+    }
+
+    function saveCart() { localStorage.setItem('crochet_cart', JSON.stringify(cart)); }
+
+    function calculateCartTotals() {
+      const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+      const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      const sortedOffers = [...offersList].sort((a, b) => b.minQty - a.minQty);
+      let applicableOffer = null;
+      for (let offer of sortedOffers) {
+        if (totalQty >= offer.minQty) { applicableOffer = offer; break; }
+      }
+
+      let finalTotal = subtotal;
+      let discountAmount = 0;
+      if (applicableOffer) {
+        finalTotal = applicableOffer.bundlePrice;
+        if (totalQty > applicableOffer.minQty) {
+          const extraItems = totalQty - applicableOffer.minQty;
+          const avgUnit = subtotal / totalQty;
+          finalTotal += Math.round(extraItems * (avgUnit * 0.8));
+        }
+        discountAmount = Math.max(0, subtotal - finalTotal);
+      }
+      return { totalQty, subtotal, discountAmount, finalTotal, applicableOffer };
+    }
+
+    function updateCartUI() {
+      const countBadge = document.getElementById('cart-count-badge');
+      const cartList = document.getElementById('cart-items-list');
+      const subtotalEl = document.getElementById('cart-subtotal-price');
+      const discountRow = document.getElementById('discount-row');
+      const discountEl = document.getElementById('cart-discount-price');
+      const totalPriceEl = document.getElementById('cart-total-price');
+      const offerNotice = document.getElementById('cart-offer-notice');
+      const offerText = document.getElementById('cart-offer-text');
+
+      const { totalQty, subtotal, discountAmount, finalTotal, applicableOffer } = calculateCartTotals();
+      countBadge.innerText = totalQty;
+      subtotalEl.innerText = `₹${subtotal.toLocaleString('en-IN')}`;
+      totalPriceEl.innerText = `₹${finalTotal.toLocaleString('en-IN')}`;
+
+      if (applicableOffer && discountAmount > 0) {
+        discountRow.classList.remove('hidden');
+        discountEl.innerText = `-₹${discountAmount.toLocaleString('en-IN')}`;
+        offerNotice.classList.remove('hidden');
+        offerText.innerText = `${applicableOffer.title} applied!`;
+      } else {
+        discountRow.classList.add('hidden');
+        offerNotice.classList.add('hidden');
+      }
+
+      if (cart.length === 0) {
+        cartList.innerHTML = `
+          <div class="text-center py-12 text-stone-400">
+            <span class="text-3xl block mb-2">🛍️</span>
+            <p class="text-sm font-medium">Your bag is empty</p>
+          </div>
+        `;
+        return;
+      }
+
+      cartList.innerHTML = cart.map(item => {
+        const cartKey = item.id + "_" + (item.size || "Standard");
+        return `
+          <div class="flex items-center gap-3 bg-white p-3 rounded-xl border border-cream-200 shadow-2xs">
+            <img src="${item.image}" alt="${item.title}" class="w-14 h-14 object-cover rounded-lg bg-cream-100 flex-shrink-0">
+            <div class="flex-grow min-w-0">
+              <h4 class="font-serif font-bold text-xs text-stone-800 truncate">${item.title}</h4>
+              <p class="text-[10px] text-stone-500 font-medium">Size: ${item.size || 'Standard'}</p>
+              <p class="text-terracotta-500 font-semibold text-xs mt-0.5">₹${item.price}</p>
+            </div>
+            <div class="flex items-center gap-2 bg-cream-50 rounded-lg border border-cream-200 p-1">
+              <button onclick="updateQuantity('${cartKey}', -1)" class="w-5 h-5 flex items-center justify-center text-xs font-bold text-stone-600 hover:bg-cream-200 rounded">-</button>
+              <span class="text-xs font-bold text-stone-800 w-4 text-center">${item.qty}</span>
+              <button onclick="updateQuantity('${cartKey}', 1)" class="w-5 h-5 flex items-center justify-center text-xs font-bold text-stone-600 hover:bg-cream-200 rounded">+</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleCart(forceOpen = false) {
+      const drawer = document.getElementById('cart-drawer');
+      const overlay = document.getElementById('cart-drawer-overlay');
+      if (forceOpen || drawer.classList.contains('translate-x-full')) {
+        drawer.classList.remove('translate-x-full');
+        overlay.classList.remove('hidden');
+      } else {
+        drawer.classList.add('translate-x-full');
+        overlay.classList.add('hidden');
+      }
+    }
+
+    function sendOrderToWhatsApp() {
+      if (cart.length === 0) { alert("Your bag is empty!"); return; }
+      const name = document.getElementById('cust-name').value.trim();
+      const phone = document.getElementById('cust-phone').value.trim();
+      const address = document.getElementById('cust-address').value.trim();
+
+      if (!name || !phone || !address) { alert("Please fill in your Name, Phone Number, and Delivery Address."); return; }
+
+      const { subtotal, discountAmount, finalTotal, applicableOffer } = calculateCartTotals();
+      const orderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
+
+      const newOrder = {
+        id: orderId,
+        date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+        customer: { name, phone, address },
+        items: cart,
+        subtotal, discount: discountAmount, total: finalTotal,
+        appliedOffer: applicableOffer ? applicableOffer.title : null
+      };
+
+      let storedOrders = JSON.parse(localStorage.getItem('crochet_orders')) || [];
+      storedOrders.unshift(newOrder);
+      localStorage.setItem('crochet_orders', JSON.stringify(storedOrders));
+
+      let msg = `✨ *NEW ORDER RECEIVED!* ✨\n`;
+      msg += `*Order ID:* ${orderId}\n\n`;
+      msg += `👤 *Customer:* ${name}\n`;
+      msg += `📞 *Phone:* ${phone}\n`;
+      msg += `📍 *Delivery Address:* ${address}\n\n`;
+      msg += `🛒 *ORDER SUMMARY:*\n`;
+
+      cart.forEach((item, index) => {
+        msg += `${index + 1}. ${item.title} [Size: ${item.size || 'Standard'}] (x${item.qty}) - ₹${item.price * item.qty}\n`;
+      });
+
+      msg += `\nSubtotal: ₹${subtotal}\n`;
+      if (discountAmount > 0) { msg += `🎉 Offer Applied: *${applicableOffer.title}* (-₹${discountAmount})\n`; }
+      msg += `💰 *Final Total Amount:* ₹${finalTotal}\n\n`;
+      msg += `Please confirm product availability and share UPI payment details! 🧶`;
+
+      const whatsappNum = settings.whatsappNumber || "919876543210";
+      window.open(`https://wa.me/${whatsappNum}?text=${encodeURIComponent(msg)}`, '_blank');
+
+      cart = [];
+      saveCart();
+      updateCartUI();
+      toggleCart();
+    }
+  </script>
+</body>
+</html>
