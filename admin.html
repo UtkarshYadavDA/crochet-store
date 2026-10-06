@@ -197,6 +197,51 @@
 
   <!-- Script Logic -->
   <script>
+    // --- HIGH SECURITY ADMIN PIN PROTECTION ---
+    const ADMIN_PIN = "7887"; // <-- CHANGE THIS TO YOUR SECRET PIN CODE
+
+    function verifyAdminAccess() {
+      const isAuthenticated = sessionStorage.getItem("admin_authenticated");
+      if (isAuthenticated === "true") {
+        return; 
+      }
+
+      let attempts = 3;
+      while (attempts > 0) {
+        let enteredPin = prompt("🔒 Restricted Admin Access\nEnter your 4-digit security PIN:");
+        
+        if (enteredPin === null) {
+          document.body.innerHTML = `<div style="text-align:center; margin-top:20vh; font-family:sans-serif;">
+            <h1 style="color:red;">Access Denied</h1>
+            <p>You must enter a valid PIN to access the control center.</p>
+            <a href="index.html" style="color:blue; text-decoration:underline;">Return to Storefront</a>
+          </div>`;
+          throw new Error("Admin access cancelled.");
+        }
+
+        if (enteredPin === ADMIN_PIN) {
+          sessionStorage.setItem("admin_authenticated", "true");
+          alert("Access Granted!");
+          return;
+        } else {
+          attempts--;
+          if (attempts > 0) {
+            alert(`❌ Incorrect PIN. You have ${attempts} attempt(s) remaining.`);
+          }
+        }
+      }
+
+      document.body.innerHTML = `<div style="text-align:center; margin-top:20vh; font-family:sans-serif;">
+        <h1 style="color:red;">🔒 Security Lockout</h1>
+        <p>Too many incorrect PIN attempts. Access blocked for this session.</p>
+        <a href="index.html" style="color:blue; text-decoration:underline;">Return to Storefront</a>
+      </div>`;
+      throw new Error("Admin locked out due to incorrect PINs.");
+    }
+
+    // Run security check immediately before loading any page components
+    verifyAdminAccess();
+
     const firebaseConfig = {
       apiKey: "AIzaSyCdQLc02N4y6W6XjBiBoGzNG-PVII1GyOI",
       authDomain: "crochet-website04.firebaseapp.com",
