@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Studio Admin Portal | Manage Store & Sizes</title>
+  <title>Admin Dashboard | Artisan Crochet Studio</title>
+  <!-- Firebase SDKs (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
@@ -30,232 +31,154 @@
 </head>
 <body class="bg-cream-50 font-sans text-stone-800 antialiased min-h-screen flex flex-col">
 
-  <!-- PIN Authentication Screen -->
-  <div id="auth-screen" class="fixed inset-0 bg-stone-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="bg-sand-100 p-8 rounded-3xl border border-cream-200 shadow-2xl max-w-sm w-full text-center space-y-5">
-      <div class="w-12 h-12 bg-terracotta-500/10 text-terracotta-500 rounded-full flex items-center justify-center mx-auto text-2xl">🔐</div>
-      <div>
-        <h2 class="font-serif font-bold text-2xl text-stone-900">Admin Authentication</h2>
-        <p class="text-xs text-stone-500 mt-1">Enter your master PIN to access shop settings and orders.</p>
-      </div>
-      <input type="password" id="pin-input" placeholder="Enter Master PIN" class="w-full text-center text-lg font-bold tracking-widest bg-white border border-cream-200 rounded-xl py-3 px-4 outline-none focus:ring-2 focus:ring-terracotta-500">
-      <button onclick="checkPin()" class="w-full bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold py-3 rounded-xl shadow-md transition-colors text-sm">
-        Unlock Portal
-      </button>
-      <p id="auth-error" class="text-xs text-red-500 hidden font-medium">Incorrect PIN. Please try again.</p>
-    </div>
-  </div>
-
   <!-- Admin Header -->
-  <header class="bg-stone-900 text-white py-4 px-4 sm:px-8 border-b border-stone-800 flex items-center justify-between">
-    <div class="flex items-center gap-3">
-      <span class="text-2xl">🧶</span>
-      <div>
-        <h1 class="font-serif font-bold text-lg leading-none text-white">Owner Dashboard</h1>
-        <p class="text-[10px] text-stone-400 uppercase tracking-widest mt-0.5">Private Store Management</p>
+  <header class="bg-stone-900 text-white border-b border-stone-800 sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🔐</span>
+        <div>
+          <h1 class="font-serif font-bold text-lg sm:text-xl tracking-tight">Admin Control Panel</h1>
+          <p class="text-[10px] text-stone-400 uppercase tracking-widest font-medium">Artisan Crochet Studio</p>
+        </div>
       </div>
-    </div>
-    <div class="flex items-center gap-3">
-      <a href="index.html" target="_blank" class="text-xs bg-stone-800 hover:bg-stone-700 text-stone-300 px-3 py-1.5 rounded-lg border border-stone-700 transition-colors">
-        👁️ View Live Store
+      <a href="index.html" target="_blank" class="bg-stone-800 hover:bg-stone-700 text-stone-200 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 border border-stone-700">
+        <span>🌐</span> View Live Store
       </a>
-      <button onclick="lockPortal()" class="text-xs bg-red-500/20 text-red-300 hover:bg-red-500/30 px-3 py-1.5 rounded-lg transition-colors">
-        🔒 Lock
-      </button>
     </div>
   </header>
 
-  <!-- Admin Main Navigation Tabs -->
-  <div class="bg-sand-100 border-b border-cream-200 px-4 sm:px-8">
-    <div class="max-w-6xl mx-auto flex gap-4 text-xs font-semibold overflow-x-auto">
-      <button id="tab-btn-products" onclick="switchTab('products')" class="py-3 border-b-2 border-terracotta-500 text-terracotta-500 font-bold">📦 Products & Sizes</button>
-      <button id="tab-btn-offers" onclick="switchTab('offers')" class="py-3 border-b-2 border-transparent text-stone-500 hover:text-stone-800">🎁 Bundle Offers (<span id="offer-count">0</span>)</button>
-      <button id="tab-btn-orders" onclick="switchTab('orders')" class="py-3 border-b-2 border-transparent text-stone-500 hover:text-stone-800">📋 Customer Orders (<span id="order-count">0</span>)</button>
-      <button id="tab-btn-settings" onclick="switchTab('settings')" class="py-3 border-b-2 border-transparent text-stone-500 hover:text-stone-800">⚙️ Banner & Timer</button>
-      <button id="tab-btn-security" onclick="switchTab('security')" class="py-3 border-b-2 border-transparent text-stone-500 hover:text-stone-800">🔑 Security & PIN</button>
+  <!-- Main Container -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full space-y-10">
+
+    <!-- Navigation Tabs -->
+    <div class="flex flex-wrap gap-2 border-b border-cream-200 pb-4">
+      <button onclick="switchTab('products')" id="tab-btn-products" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-terracotta-500 text-white shadow-sm">🧶 Manage Products & Stock</button>
+      <button onclick="switchTab('orders')" id="tab-btn-orders" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">📦 Customer Orders</button>
+      <button onclick="switchTab('settings')" id="tab-btn-settings" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">⚙️ Store Settings & Offers</button>
     </div>
-  </div>
 
-  <!-- Main Portal Content -->
-  <main class="max-w-6xl mx-auto px-4 sm:px-8 py-8 flex-grow w-full">
-
-    <!-- Tab 1: Product & Pricing & Sizes Management -->
-    <section id="tab-products" class="space-y-8">
-      <!-- Category Manager Card -->
-      <div class="bg-sand-100 p-6 rounded-2xl border border-cream-200 shadow-sm space-y-4">
-        <h2 class="font-serif font-bold text-lg text-stone-900 border-b border-cream-200 pb-3">🏷️ Manage Store Categories</h2>
-        <div class="flex gap-2 max-w-md">
-          <input type="text" id="new-cat-input" placeholder="e.g. Keychains / Accessories" class="flex-grow text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none">
-          <button onclick="addCategory()" class="bg-sage-500 hover:bg-sage-600 text-white font-semibold text-xs px-4 py-3 rounded-xl transition-colors">+ Add Category</button>
+    <!-- TAB 1: PRODUCTS & STOCK MANAGEMENT -->
+    <section id="tab-content-products" class="space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 class="font-serif font-bold text-xl text-stone-900">Catalog & Live Stock Control</h2>
+            <p class="text-xs text-stone-500 mt-0.5">Toggle products in-stock or out-of-stock instantly, add new items, or edit details.</p>
+          </div>
+          <button onclick="openProductModal()" class="bg-sage-500 hover:bg-sage-600 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5">
+            <span>➕</span> Add New Product
+          </button>
         </div>
-        <div id="category-badge-list" class="flex flex-wrap gap-2 pt-2"></div>
+
+        <!-- Products Grid -->
+        <div id="admin-product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
       </div>
+    </section>
 
-      <!-- Add/Edit Product Card -->
-      <div class="bg-sand-100 p-6 rounded-2xl border border-cream-200 shadow-sm space-y-4">
-        <div class="flex justify-between items-center border-b border-cream-200 pb-3">
-          <h2 id="form-heading" class="font-serif font-bold text-lg text-stone-900">➕ Add New Crochet Product</h2>
-          <button id="cancel-edit-btn" onclick="resetProductForm()" class="hidden text-xs bg-stone-200 hover:bg-stone-300 text-stone-700 px-3 py-1.5 rounded-lg font-semibold transition-colors">Cancel Edit</button>
+    <!-- TAB 2: CUSTOMER ORDERS -->
+    <section id="tab-content-orders" class="space-y-6 hidden">
+      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs">
+        <h2 class="font-serif font-bold text-xl text-stone-900 mb-1">Customer Orders</h2>
+        <p class="text-xs text-stone-500 mb-6">Orders placed through WhatsApp checkout sync here automatically.</p>
+        <div id="admin-orders-list" class="space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: SETTINGS & OFFERS -->
+    <section id="tab-content-settings" class="space-y-6 hidden">
+      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs space-y-6">
+        <div>
+          <h2 class="font-serif font-bold text-xl text-stone-900 mb-1">Store Settings & WhatsApp Config</h2>
+          <p class="text-xs text-stone-500">Configure your storefront details and WhatsApp order routing number.</p>
         </div>
-
-        <input type="hidden" id="edit-product-id" value="">
-
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Product Title *</label>
-            <input type="text" id="p-title" placeholder="e.g. Handmade Daisy Bouquet" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none">
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Shop Name</label>
+            <input type="text" id="set-shop-name" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Category *</label>
-            <select id="p-category" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none"></select>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Tagline</label>
+            <input type="text" id="set-tagline" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Offer Selling Price (₹) *</label>
-            <input type="number" id="p-price" placeholder="699" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none">
+            <label class="block text-xs font-semibold text-stone-600 mb-1">WhatsApp Phone Number (with Country Code)</label>
+            <input type="text" id="set-whatsapp" placeholder="919876543210" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
           </div>
           <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Original / Compare Price (₹) (Crossed Out)</label>
-            <input type="number" id="p-orig-price" placeholder="1499" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Sizes Options (Optional - comma separated)</label>
-            <input type="text" id="p-sizes" placeholder="e.g. Small, Medium, Large" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Badge / Tag (Optional)</label>
-            <input type="text" id="p-badge" placeholder="e.g. Limited Offer" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none">
-          </div>
-          <div class="sm:col-span-2">
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Product Description</label>
-            <input type="text" id="p-desc" placeholder="Briefly describe materials, size, yarn type..." class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none">
-          </div>
-          <div class="sm:col-span-2 space-y-2">
-            <label class="block text-xs font-semibold text-stone-700">Product Image (Choose Option A or B)</label>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <span class="text-[10px] text-stone-500 block mb-1">Option A: Upload Image File</span>
-                <input type="file" id="p-file" accept="image/*" onchange="convertImageToBase64()" class="text-xs text-stone-500 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-terracotta-500 file:text-white">
-              </div>
-              <div>
-                <span class="text-[10px] text-stone-500 block mb-1">Option B: Paste Web Image URL</span>
-                <input type="url" id="p-url" placeholder="https://..." class="w-full text-xs bg-white border border-cream-200 rounded-xl p-2.5 outline-none">
-              </div>
-            </div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Top Announcement Banner Text</label>
+            <input type="text" id="set-announcement" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
           </div>
         </div>
-
-        <button id="save-product-btn" onclick="saveProduct()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold text-xs px-6 py-3 rounded-xl shadow-xs transition-colors">💾 Save Product to Live Store</button>
-      </div>
-
-      <!-- Current Products Table -->
-      <div class="bg-sand-100 p-6 rounded-2xl border border-cream-200 shadow-sm space-y-4">
-        <h3 class="font-serif font-bold text-base text-stone-900">Current Catalog Items</h3>
-        <div id="admin-product-list" class="space-y-3"></div>
-      </div>
-    </section>
-
-    <!-- Tab 2: Bundle Offers Management -->
-    <section id="tab-offers" class="hidden space-y-8">
-      <div class="bg-sand-100 p-6 rounded-2xl border border-cream-200 shadow-sm space-y-4 max-w-xl">
-        <div class="border-b border-cream-200 pb-3">
-          <h2 id="offer-form-heading" class="font-serif font-bold text-lg text-stone-900">🎁 Add New Bundle Offer</h2>
-        </div>
-        <input type="hidden" id="edit-offer-id" value="">
-        <div class="space-y-3">
-          <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Offer Title *</label>
-            <input type="text" id="o-title" placeholder="e.g. 5 Items Combo Offer" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none">
-          </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-stone-700 mb-1">Minimum Item Quantity *</label>
-              <input type="number" id="o-min-qty" placeholder="5" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-stone-700 mb-1">Special Bundle Price (₹) *</label>
-              <input type="number" id="o-bundle-price" placeholder="1499" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none">
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-stone-700 mb-1">Offer Description (Shown in Cart)</label>
-            <input type="text" id="o-desc" placeholder="e.g. Add any 5 items to your bag and get them for just ₹1,499!" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none">
-          </div>
-        </div>
-        <div class="flex gap-2 pt-2">
-          <button id="save-offer-btn" onclick="saveOffer()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold text-xs px-6 py-3 rounded-xl shadow-xs transition-colors">💾 Save Bundle Offer</button>
-          <button id="cancel-offer-btn" onclick="resetOfferForm()" class="hidden text-xs bg-stone-200 hover:bg-stone-300 text-stone-700 px-4 py-3 rounded-xl font-semibold">Cancel</button>
-        </div>
-      </div>
-      <div class="bg-sand-100 p-6 rounded-2xl border border-cream-200 shadow-sm space-y-4">
-        <h3 class="font-serif font-bold text-base text-stone-900">Active Bundle Offers</h3>
-        <div id="admin-offer-list" class="space-y-3"></div>
-      </div>
-    </section>
-
-    <!-- Tab 3: Customer Orders -->
-    <section id="tab-orders" class="hidden space-y-6">
-      <div class="flex items-center justify-between border-b border-cream-200 pb-4">
-        <div>
-          <h2 class="font-serif font-bold text-lg text-stone-900">Stored Customer Orders</h2>
-        </div>
-        <button onclick="exportOrdersToCSV()" class="bg-sage-500 hover:bg-sage-600 text-white font-semibold text-xs px-4 py-2 rounded-xl transition-colors">📊 Export CSV</button>
-      </div>
-      <div id="admin-orders-list" class="space-y-4"></div>
-    </section>
-
-    <!-- Tab 4: Store Settings & Timer -->
-    <section id="tab-settings" class="hidden space-y-6">
-      <div class="bg-sand-100 p-6 rounded-2xl border border-cream-200 shadow-sm space-y-4 max-w-xl">
-        <h2 class="font-serif font-bold text-lg text-stone-900 border-b border-cream-200 pb-3">⚙️ Banner, Brand & Timer</h2>
-        <div class="space-y-3">
-          <div><label class="block text-xs font-semibold text-stone-700 mb-1">Top Announcement Banner</label><input type="text" id="set-banner" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none"></div>
-          <div><label class="block text-xs font-semibold text-stone-700 mb-1">Shop Name</label><input type="text" id="set-shop-name" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none"></div>
-          <div><label class="block text-xs font-semibold text-stone-700 mb-1">Tagline</label><input type="text" id="set-tagline" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none"></div>
-          <div><label class="block text-xs font-semibold text-stone-700 mb-1">WhatsApp Number</label><input type="text" id="set-whatsapp" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none"></div>
-          <div><label class="block text-xs font-semibold text-stone-700 mb-1">Hero Title</label><input type="text" id="set-hero-title" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none"></div>
-          <div><label class="block text-xs font-semibold text-stone-700 mb-1">Hero Description</label><textarea id="set-hero-desc" rows="3" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none"></textarea></div>
-          <div class="pt-3 border-t border-cream-200 space-y-3">
-            <div class="flex items-center gap-2"><input type="checkbox" id="set-timer-enabled" class="w-4 h-4 text-terracotta-500 rounded"><label class="text-xs font-bold text-stone-800">Enable Countdown Timer</label></div>
-            <div><label class="block text-xs font-semibold text-stone-700 mb-1">Timer Heading</label><input type="text" id="set-timer-title" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none"></div>
-            <div><label class="block text-xs font-semibold text-stone-700 mb-1">Timer End Date & Time</label><input type="datetime-local" id="set-timer-end" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none"></div>
-          </div>
-        </div>
-        <button onclick="saveStoreSettings()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold text-xs px-6 py-3 rounded-xl transition-colors">💾 Save Settings</button>
-      </div>
-    </section>
-
-    <!-- Tab 5: Security -->
-    <section id="tab-security" class="hidden space-y-6">
-      <div class="bg-sand-100 p-6 rounded-2xl border border-cream-200 shadow-sm space-y-4 max-w-md">
-        <h2 class="font-serif font-bold text-lg text-stone-900 border-b border-cream-200 pb-3">🔑 Change Master PIN</h2>
-        <div class="space-y-3">
-          <div><label class="block text-xs font-semibold text-stone-700 mb-1">Current PIN</label><input type="password" id="sec-current-pin" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none"></div>
-          <div><label class="block text-xs font-semibold text-stone-700 mb-1">New PIN</label><input type="password" id="sec-new-pin" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none"></div>
-          <div><label class="block text-xs font-semibold text-stone-700 mb-1">Confirm New PIN</label><input type="password" id="sec-confirm-pin" class="w-full text-xs bg-white border border-cream-200 rounded-xl p-3 outline-none"></div>
-        </div>
-        <button onclick="changeMasterPin()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold text-xs px-6 py-3 rounded-xl transition-colors">🔒 Update PIN</button>
+        <button onclick="saveStoreSettings()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold text-xs px-6 py-3 rounded-xl shadow-xs transition-all">Save Settings</button>
       </div>
     </section>
 
   </main>
 
-  <!-- Printable Receipt Modal -->
-  <div id="invoice-modal" class="fixed inset-0 bg-stone-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white p-8 rounded-2xl max-w-md w-full shadow-2xl space-y-6 text-stone-800 border border-cream-200">
-      <div class="flex justify-between items-center border-b border-stone-200 pb-3">
-        <h3 class="font-serif font-bold text-lg text-stone-900">Receipt / Invoice</h3>
-        <button onclick="closeInvoiceModal()" class="text-stone-400 hover:text-stone-800 text-lg">✕</button>
+  <!-- ADD / EDIT PRODUCT MODAL -->
+  <div id="product-modal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 border border-cream-200 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-cream-200 pb-3">
+        <h3 id="modal-title" class="font-serif font-bold text-lg text-stone-900">Add New Product</h3>
+        <button onclick="closeProductModal()" class="text-stone-400 hover:text-stone-800 text-xl font-bold">✕</button>
       </div>
-      <div id="invoice-print-area" class="space-y-4 text-xs"></div>
-      <div class="flex gap-2 pt-2">
-        <button onclick="window.print()" class="flex-1 bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold py-2.5 rounded-xl text-xs transition-colors">🖨 Print / PDF</button>
-        <button onclick="closeInvoiceModal()" class="px-4 bg-stone-100 hover:bg-stone-200 text-stone-700 font-semibold py-2.5 rounded-xl text-xs">Close</button>
+      
+      <input type="hidden" id="edit-product-id">
+      
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 mb-1">Product Title *</label>
+          <input type="text" id="prod-title" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Category *</label>
+            <input type="text" id="prod-category" placeholder="Bouquets, Bags..." class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Badge (Optional)</label>
+            <input type="text" id="prod-badge" placeholder="Trending, Limited..." class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Selling Price (₹) *</label>
+            <input type="number" id="prod-price" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Original Price (₹)</label>
+            <input type="number" id="prod-original-price" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 mb-1">Image URL *</label>
+          <input type="url" id="prod-image" placeholder="https://images.unsplash.com/..." class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 mb-1">Available Sizes (Comma separated)</label>
+          <input type="text" id="prod-sizes" placeholder="Small, Medium, Large" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-stone-600 mb-1">Description</label>
+          <textarea id="prod-desc" rows="2" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500"></textarea>
+        </div>
+        
+        <!-- Stock Toggle Checkbox -->
+        <div class="flex items-center gap-3 pt-2 bg-sand-100 p-3 rounded-xl border border-cream-200">
+          <input type="checkbox" id="prod-in-stock" checked class="w-4 h-4 text-terracotta-500 rounded border-cream-200 focus:ring-terracotta-500">
+          <label for="prod-in-stock" class="text-xs font-semibold text-stone-800 cursor-pointer">Product is In Stock (Uncheck to mark Out of Stock)</label>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-cream-200">
+        <button onclick="closeProductModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-sand-100 text-stone-600 hover:bg-sand-200">Cancel</button>
+        <button onclick="saveProductData()" class="px-5 py-2.5 rounded-xl text-xs font-semibold bg-terracotta-500 hover:bg-terracotta-600 text-white shadow-xs">Save Product</button>
       </div>
     </div>
   </div>
 
+  <!-- ADMIN SCRIPT -->
   <script>
-    // Your web app's Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyCdQLc02N4y6W6XjBiBoGzNG-PVII1GyOI",
       authDomain: "crochet-website04.firebaseapp.com",
@@ -266,329 +189,237 @@
       measurementId: "G-7EHXSXZ71M"
     };
 
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const analytics = firebase.analytics();
-      
-    let uploadedImageBase64 = "";
-    let existingImageUrl = "";
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    const db = firebase.firestore();
 
-    let masterPin = localStorage.getItem('crochet_master_pin') || "1234";
-    let categoriesList = JSON.parse(localStorage.getItem('crochet_categories')) || ["Bouquets", "Bags", "Amigurumi", "Wearables", "Home Decor"];
-    let products = JSON.parse(localStorage.getItem('crochet_products')) || [];
-    let offersList = JSON.parse(localStorage.getItem('crochet_offers')) || [];
-    let orders = JSON.parse(localStorage.getItem('crochet_orders')) || [];
-    let settings = JSON.parse(localStorage.getItem('crochet_settings')) || {};
+    let adminProducts = [];
+    let adminOrders = [];
+    let adminSettings = JSON.parse(localStorage.getItem('crochet_settings')) || {
+      shopName: "Artisan Crochet",
+      tagline: "Handmade Studio",
+      whatsappNumber: "919876543210",
+      announcementBanner: "✨ Free Shipping on orders over ₹1,499 | Handcrafted with Love in India ✨"
+    };
 
-    document.addEventListener("DOMContentLoaded", () => {
-      if (sessionStorage.getItem('admin_authenticated') === 'true') {
-        document.getElementById('auth-screen').classList.add('hidden');
-      }
-      loadCategoryDropdown();
-      loadAdminProducts();
-      loadAdminOffers();
-      loadAdminOrders();
-      loadSettingsForm();
+    document.addEventListener("DOMContentLoaded", async () => {
+      loadSettingsUI();
+      await fetchAdminData();
     });
 
-    function checkPin() {
-      const pin = document.getElementById('pin-input').value;
-      if (pin === masterPin) {
-        sessionStorage.setItem('admin_authenticated', 'true');
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('auth-error').classList.add('hidden');
-      } else {
-        document.getElementById('auth-error').classList.remove('hidden');
-      }
-    }
-
-    function lockPortal() { sessionStorage.removeItem('admin_authenticated'); location.reload(); }
-
-    function switchTab(tab) {
-      ['products', 'offers', 'orders', 'settings', 'security'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.add('hidden');
-        document.getElementById(`tab-btn-${t}`).className = "py-3 border-b-2 border-transparent text-stone-500 hover:text-stone-800";
+    function switchTab(tabName) {
+      ['products', 'orders', 'settings'].forEach(t => {
+        document.getElementById(`tab-content-${t}`).classList.add('hidden');
+        document.getElementById(`tab-btn-${t}`).className = "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200";
       });
-      document.getElementById(`tab-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-btn-${tab}`).className = "py-3 border-b-2 border-terracotta-500 text-terracotta-500 font-bold";
+      document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
+      document.getElementById(`tab-btn-${tabName}`).className = "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-terracotta-500 text-white shadow-sm";
     }
 
-    function loadCategoryDropdown() {
-      const select = document.getElementById('p-category');
-      const badgeList = document.getElementById('category-badge-list');
-      select.innerHTML = categoriesList.map(c => `<option value="${c}">${c}</option>`).join('');
-      badgeList.innerHTML = categoriesList.map(c => `
-        <span class="inline-flex items-center gap-1.5 bg-white border border-cream-200 text-stone-700 text-xs px-3 py-1 rounded-full font-medium">
-          ${c} <button onclick="deleteCategory('${c}')" class="text-stone-400 hover:text-red-500 font-bold">✕</button>
-        </span>
-      `).join('');
-    }
+    async function fetchAdminData() {
+      // Fetch Products from Firestore
+      try {
+        const prodSnap = await db.collection("products").get();
+        adminProducts = [];
+        prodSnap.forEach(doc => { adminProducts.push({ id: doc.id, ...doc.data() }); });
+        renderAdminProducts();
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      }
 
-    function addCategory() {
-      const newCat = document.getElementById('new-cat-input').value.trim();
-      if (!newCat) return;
-      if (categoriesList.includes(newCat)) { alert("Category already exists."); return; }
-      categoriesList.push(newCat);
-      localStorage.setItem('crochet_categories', JSON.stringify(categoriesList));
-      document.getElementById('new-cat-input').value = '';
-      loadCategoryDropdown();
-    }
-
-    function deleteCategory(catName) {
-      if (confirm(`Delete category "${catName}"?`)) {
-        categoriesList = categoriesList.filter(c => c !== catName);
-        localStorage.setItem('crochet_categories', JSON.stringify(categoriesList));
-        loadCategoryDropdown();
+      // Fetch Orders from Firestore
+      try {
+        const orderSnap = await db.collection("orders").orderBy("createdAt", "desc").get();
+        adminOrders = [];
+        orderSnap.forEach(doc => { adminOrders.push(doc.data()); });
+        renderAdminOrders();
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+        adminOrders = JSON.parse(localStorage.getItem('crochet_orders')) || [];
+        renderAdminOrders();
       }
     }
 
-    function convertImageToBase64() {
-      const file = document.getElementById('p-file').files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onloadend = function () { uploadedImageBase64 = reader.result; };
-      reader.readAsDataURL(file);
+    function renderAdminProducts() {
+      const grid = document.getElementById('admin-product-grid');
+      if (adminProducts.length === 0) {
+        grid.innerHTML = `<p class="text-xs text-stone-400 col-span-full text-center py-8">No products found. Click 'Add New Product' above.</p>`;
+        return;
+      }
+
+      grid.innerHTML = adminProducts.map(p => {
+        const isStock = p.inStock !== false;
+        return `
+          <div class="bg-sand-100 rounded-2xl border border-cream-200 p-4 flex flex-col justify-between shadow-2xs">
+            <div>
+              <div class="relative h-40 rounded-xl overflow-hidden bg-cream-100 mb-3">
+                <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover ${!isStock ? 'grayscale opacity-50' : ''}">
+                <span class="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold ${isStock ? 'bg-sage-500 text-white' : 'bg-stone-800 text-white'}">
+                  ${isStock ? '🟢 In Stock' : '🔴 Out of Stock'}
+                </span>
+              </div>
+              <span class="text-[10px] font-semibold text-sage-600 uppercase tracking-widest">${p.category}</span>
+              <h3 class="font-serif font-bold text-sm text-stone-900 truncate">${p.title}</h3>
+              <p class="text-xs font-bold text-terracotta-500 mt-0.5">₹${p.price}</p>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-cream-200 flex items-center justify-between gap-2">
+              <button onclick="toggleStockStatus('${p.id}', ${!isStock})" class="flex-grow text-[10px] font-bold py-2 px-2 rounded-xl border transition-all ${
+                isStock ? 'bg-stone-100 hover:bg-stone-200 text-stone-700 border-cream-200' : 'bg-sage-500 hover:bg-sage-600 text-white border-sage-600'
+              }">
+                ${isStock ? 'Mark Out of Stock' : 'Mark In Stock'}
+              </button>
+              <button onclick="openEditProductModal('${p.id}')" class="bg-white hover:bg-cream-50 text-stone-700 border border-cream-200 text-xs px-3 py-2 rounded-xl font-semibold">Edit</button>
+              <button onclick="deleteProduct('${p.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs px-2.5 py-2 rounded-xl font-semibold">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
-    function editProduct(id) {
-      const prod = products.find(p => p.id === id);
-      if (!prod) return;
-      document.getElementById('edit-product-id').value = prod.id;
-      document.getElementById('p-title').value = prod.title;
-      document.getElementById('p-category').value = prod.category;
-      document.getElementById('p-price').value = prod.price;
-      document.getElementById('p-orig-price').value = prod.originalPrice || '';
-      document.getElementById('p-sizes').value = prod.sizes || '';
-      document.getElementById('p-badge').value = prod.badge || '';
-      document.getElementById('p-desc').value = prod.description || '';
-      document.getElementById('p-url').value = prod.image.startsWith('data:') ? '' : prod.image;
-      existingImageUrl = prod.image;
-      uploadedImageBase64 = "";
-      document.getElementById('form-heading').innerText = "✏️ Edit Product: " + prod.title;
-      document.getElementById('save-product-btn').innerText = "💾 Update Product";
-      document.getElementById('cancel-edit-btn').classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Toggle stock instantly from admin grid card
+    async function toggleStockStatus(productId, newStockState) {
+      try {
+        await db.collection("products").doc(productId).update({ inStock: newStockState });
+        const prod = adminProducts.find(p => p.id === productId);
+        if (prod) prod.inStock = newStockState;
+        renderAdminProducts();
+      } catch (err) {
+        console.error("Error updating stock status:", err);
+        alert("Failed to update stock status in Firebase.");
+      }
     }
 
-    function resetProductForm() {
-      document.getElementById('edit-product-id').value = '';
-      document.getElementById('p-title').value = '';
-      document.getElementById('p-price').value = '';
-      document.getElementById('p-orig-price').value = '';
-      document.getElementById('p-sizes').value = '';
-      document.getElementById('p-badge').value = '';
-      document.getElementById('p-desc').value = '';
-      document.getElementById('p-url').value = '';
-      document.getElementById('p-file').value = '';
-      uploadedImageBase64 = "";
-      existingImageUrl = "";
-      document.getElementById('form-heading').innerText = "➕ Add New Crochet Product";
-      document.getElementById('save-product-btn').innerText = "💾 Save Product to Live Store";
-      document.getElementById('cancel-edit-btn').classList.add('hidden');
+    function renderAdminOrders() {
+      const container = document.getElementById('admin-orders-list');
+      if (adminOrders.length === 0) {
+        container.innerHTML = `<p class="text-xs text-stone-400 text-center py-8">No customer orders recorded yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = adminOrders.map(o => `
+        <div class="bg-sand-100 p-4 rounded-2xl border border-cream-200 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-cream-200 pb-2">
+            <div>
+              <span class="font-bold text-xs text-terracotta-600">${o.orderId}</span>
+              <span class="text-xs text-stone-400 ml-2">${o.date || 'Recent'}</span>
+            </div>
+            <span class="bg-sage-500/10 text-sage-700 font-semibold text-[10px] px-2.5 py-1 rounded-full border border-sage-500/20 w-fit">Status: ${o.status || 'Pending'}</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-stone-700">
+            <div><span class="font-semibold text-stone-500">Customer:</span> ${o.customerName}</div>
+            <div><span class="font-semibold text-stone-500">Phone:</span> ${o.customerPhone}</div>
+            <div class="sm:col-span-2"><span class="font-semibold text-stone-500">Address:</span> ${o.deliveryAddress}</div>
+          </div>
+
+          <div class="bg-white p-3 rounded-xl border border-cream-200 text-xs space-y-1">
+            <p class="font-bold text-stone-800 mb-1">Items Ordered:</p>
+            ${o.items.map(item => `
+              <div class="flex justify-between text-stone-600">
+                <span>• ${item.title} (${item.size}) x${item.quantity}</span>
+                <span class="font-semibold">₹${item.lineTotal}</span>
+              </div>
+            `).join('')}
+            <div class="pt-2 border-t border-cream-200 flex justify-between font-bold text-stone-900">
+              <span>Total Amount:</span>
+              <span class="text-terracotta-600">₹${o.totalAmount}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
     }
 
-    function saveProduct() {
+    function openProductModal() {
+      document.getElementById('modal-title').innerText = "Add New Product";
+      document.getElementById('edit-product-id').value = "";
+      document.getElementById('prod-title').value = "";
+      document.getElementById('prod-category').value = "";
+      document.getElementById('prod-badge').value = "";
+      document.getElementById('prod-price').value = "";
+      document.getElementById('prod-original-price').value = "";
+      document.getElementById('prod-image').value = "";
+      document.getElementById('prod-sizes').value = "Standard";
+      document.getElementById('prod-desc').value = "";
+      document.getElementById('prod-in-stock').checked = true;
+      document.getElementById('product-modal').classList.remove('hidden');
+    }
+
+    function openEditProductModal(productId) {
+      const p = adminProducts.find(item => item.id === productId);
+      if (!p) return;
+      document.getElementById('modal-title').innerText = "Edit Product";
+      document.getElementById('edit-product-id').value = p.id;
+      document.getElementById('prod-title').value = p.title;
+      document.getElementById('prod-category').value = p.category;
+      document.getElementById('prod-badge').value = p.badge || "";
+      document.getElementById('prod-price').value = p.price;
+      document.getElementById('prod-original-price').value = p.originalPrice || "";
+      document.getElementById('prod-image').value = p.image;
+      document.getElementById('prod-sizes').value = p.sizes || "";
+      document.getElementById('prod-desc').value = p.description || "";
+      document.getElementById('prod-in-stock').checked = p.inStock !== false;
+      document.getElementById('product-modal').classList.remove('hidden');
+    }
+
+    function closeProductModal() {
+      document.getElementById('product-modal').classList.add('hidden');
+    }
+
+    async function saveProductData() {
       const editId = document.getElementById('edit-product-id').value;
-      const title = document.getElementById('p-title').value.trim();
-      const category = document.getElementById('p-category').value;
-      const price = parseFloat(document.getElementById('p-price').value);
-      const originalPrice = parseFloat(document.getElementById('p-orig-price').value) || 0;
-      const sizes = document.getElementById('p-sizes').value.trim();
-      const badge = document.getElementById('p-badge').value.trim();
-      const desc = document.getElementById('p-desc').value.trim();
-      const urlImage = document.getElementById('p-url').value.trim();
-      const image = uploadedImageBase64 || urlImage || existingImageUrl || "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?w=600&auto=format&fit=crop&q=80";
+      const title = document.getElementById('prod-title').value.trim();
+      const category = document.getElementById('prod-category').value.trim();
+      const price = Number(document.getElementById('prod-price').value);
+      const originalPrice = Number(document.getElementById('prod-original-price').value) || 0;
+      const image = document.getElementById('prod-image').value.trim();
+      const badge = document.getElementById('prod-badge').value.trim();
+      const sizes = document.getElementById('prod-sizes').value.trim();
+      const description = document.getElementById('prod-desc').value.trim();
+      const inStock = document.getElementById('prod-in-stock').checked;
 
-      if (!title || isNaN(price)) { alert("Please enter a product title and valid offer price."); return; }
-
-      if (editId) {
-        products = products.map(p => p.id === editId ? { id: editId, title, category, price, originalPrice, sizes, badge, description: desc, image } : p);
-        alert("Product updated successfully!");
-      } else {
-        products.unshift({ id: "prod_" + Date.now(), title, category, price, originalPrice, sizes, badge, description: desc, image });
-        alert("Product saved successfully!");
+      if (!title || !category || !price || !image) {
+        alert("Please fill in all required fields (Title, Category, Price, Image URL).");
+        return;
       }
 
-      localStorage.setItem('crochet_products', JSON.stringify(products));
-      resetProductForm();
-      loadAdminProducts();
-    }
+      const prodId = editId ? editId : 'p_' + Date.now();
+      const productObj = { id: prodId, title, category, price, originalPrice, image, badge, sizes, description, inStock };
 
-    function deleteProduct(id) {
-      if (confirm("Delete this product?")) {
-        products = products.filter(p => p.id !== id);
-        localStorage.setItem('crochet_products', JSON.stringify(products));
-        loadAdminProducts();
+      try {
+        await db.collection("products").doc(prodId).set(productObj);
+        closeProductModal();
+        await fetchAdminData();
+        alert("Product saved successfully to database!");
+      } catch (err) {
+        console.error("Error saving product:", err);
+        alert("Error saving product to Firebase.");
       }
     }
 
-    function loadAdminProducts() {
-      const list = document.getElementById('admin-product-list');
-      if (products.length === 0) { list.innerHTML = `<p class="text-xs text-stone-400">No products added yet.</p>`; return; }
-      list.innerHTML = products.map(p => `
-        <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-cream-200">
-          <div class="flex items-center gap-3">
-            <img src="${p.image}" class="w-12 h-12 object-cover rounded-lg bg-cream-100 flex-shrink-0">
-            <div>
-              <h4 class="font-bold text-xs text-stone-900">${p.title}</h4>
-              <p class="text-[10px] text-stone-500">${p.category} • Price: ₹${p.price} ${p.sizes ? `• Sizes: ${p.sizes}` : ''}</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="editProduct('${p.id}')" class="text-xs text-stone-700 hover:text-stone-900 font-semibold px-2.5 py-1 bg-stone-100 rounded-lg">✏️ Edit</button>
-            <button onclick="deleteProduct('${p.id}')" class="text-xs text-red-500 hover:text-red-700 font-semibold px-2.5 py-1 bg-red-50 rounded-lg">🗑️ Delete</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function loadAdminOffers() {
-      const list = document.getElementById('admin-offer-list');
-      document.getElementById('offer-count').innerText = offersList.length;
-      if (offersList.length === 0) { list.innerHTML = `<p class="text-xs text-stone-400">No active bundle offers.</p>`; return; }
-      list.innerHTML = offersList.map(o => `
-        <div class="flex items-center justify-between bg-white p-4 rounded-xl border border-cream-200">
-          <div>
-            <span class="text-[10px] font-bold text-terracotta-500 uppercase">Buy ${o.minQty}+ Items for ₹${o.bundlePrice}</span>
-            <h4 class="font-bold text-sm text-stone-900">${o.title}</h4>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="editOffer('${o.id}')" class="text-xs text-stone-700 font-semibold px-2.5 py-1 bg-stone-100 rounded-lg">✏️ Edit</button>
-            <button onclick="deleteOffer('${o.id}')" class="text-xs text-red-500 font-semibold px-2.5 py-1 bg-red-50 rounded-lg">🗑️ Delete</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function editOffer(id) {
-      const offer = offersList.find(o => o.id === id);
-      if (!offer) return;
-      document.getElementById('edit-offer-id').value = offer.id;
-      document.getElementById('o-title').value = offer.title;
-      document.getElementById('o-min-qty').value = offer.minQty;
-      document.getElementById('o-bundle-price').value = offer.bundlePrice;
-      document.getElementById('o-desc').value = offer.description;
-      document.getElementById('offer-form-heading').innerText = "✏️ Edit Bundle Offer";
-      document.getElementById('save-offer-btn').innerText = "💾 Update Offer";
-      document.getElementById('cancel-offer-btn').classList.remove('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function resetOfferForm() {
-      document.getElementById('edit-offer-id').value = '';
-      document.getElementById('o-title').value = '';
-      document.getElementById('o-min-qty').value = '';
-      document.getElementById('o-bundle-price').value = '';
-      document.getElementById('o-desc').value = '';
-      document.getElementById('offer-form-heading').innerText = "🎁 Add New Bundle Offer";
-      document.getElementById('save-offer-btn').innerText = "💾 Save Bundle Offer";
-      document.getElementById('cancel-offer-btn').classList.add('hidden');
-    }
-
-    function saveOffer() {
-      const editId = document.getElementById('edit-offer-id').value;
-      const title = document.getElementById('o-title').value.trim();
-      const minQty = parseInt(document.getElementById('o-min-qty').value);
-      const bundlePrice = parseFloat(document.getElementById('o-bundle-price').value);
-      const description = document.getElementById('o-desc').value.trim();
-      if (!title || isNaN(minQty) || isNaN(bundlePrice)) { alert("Please fill in required fields."); return; }
-
-      if (editId) {
-        offersList = offersList.map(o => o.id === editId ? { id: editId, title, minQty, bundlePrice, description } : o);
-      } else {
-        offersList.push({ id: "offer_" + Date.now(), title, minQty, bundlePrice, description });
-      }
-      localStorage.setItem('crochet_offers', JSON.stringify(offersList));
-      resetOfferForm();
-      loadAdminOffers();
-    }
-
-    function deleteOffer(id) {
-      if (confirm("Delete offer?")) {
-        offersList = offersList.filter(o => o.id !== id);
-        localStorage.setItem('crochet_offers', JSON.stringify(offersList));
-        loadAdminOffers();
+    async function deleteProduct(productId) {
+      if (!confirm("Are you sure you want to delete this product?")) return;
+      try {
+        await db.collection("products").doc(productId).delete();
+        await fetchAdminData();
+      } catch (err) {
+        console.error("Error deleting product:", err);
       }
     }
 
-    function loadAdminOrders() {
-      const list = document.getElementById('admin-orders-list');
-      document.getElementById('order-count').innerText = orders.length;
-      if (orders.length === 0) { list.innerHTML = `<p class="text-xs text-stone-400 py-8 text-center">No orders recorded yet.</p>`; return; }
-      list.innerHTML = orders.map(ord => `
-        <div class="bg-sand-100 p-5 rounded-2xl border border-cream-200 shadow-2xs space-y-3">
-          <div class="flex justify-between items-start border-b border-cream-200 pb-2">
-            <div>
-              <span class="text-[10px] font-bold text-terracotta-500 uppercase">${ord.id}</span>
-              <h4 class="font-bold text-sm text-stone-900">${ord.customer.name}</h4>
-              <p class="text-xs text-stone-500">📞 ${ord.customer.phone} | 📍 ${ord.customer.address}</p>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function loadSettingsForm() {
-      document.getElementById('set-banner').value = settings.banner || '';
-      document.getElementById('set-shop-name').value = settings.shopName || '';
-      document.getElementById('set-tagline').value = settings.tagline || '';
-      document.getElementById('set-whatsapp').value = settings.whatsapp || '';
-      document.getElementById('set-hero-title').value = settings.heroTitle || '';
-      document.getElementById('set-hero-desc').value = settings.heroDesc || '';
-      document.getElementById('set-timer-enabled').checked = settings.timerEnabled || false;
-      document.getElementById('set-timer-title').value = settings.timerTitle || '';
-      document.getElementById('set-timer-end').value = settings.timerEnd || '';
+    function loadSettingsUI() {
+      document.getElementById('set-shop-name').value = adminSettings.shopName || "";
+      document.getElementById('set-tagline').value = adminSettings.tagline || "";
+      document.getElementById('set-whatsapp').value = adminSettings.whatsappNumber || "";
+      document.getElementById('set-announcement').value = adminSettings.announcementBanner || "";
     }
 
     function saveStoreSettings() {
-      settings = {
-        banner: document.getElementById('set-banner').value.trim(),
-        shopName: document.getElementById('set-shop-name').value.trim(),
-        tagline: document.getElementById('set-tagline').value.trim(),
-        whatsapp: document.getElementById('set-whatsapp').value.trim(),
-        heroTitle: document.getElementById('set-hero-title').value.trim(),
-        heroDesc: document.getElementById('set-hero-desc').value.trim(),
-        timerEnabled: document.getElementById('set-timer-enabled').checked,
-        timerTitle: document.getElementById('set-timer-title').value.trim(),
-        timerEnd: document.getElementById('set-timer-end').value
-      };
-      localStorage.setItem('crochet_settings', JSON.stringify(settings));
-      alert("Settings saved successfully!");
-    }
-
-    function changeMasterPin() {
-      const currentPin = document.getElementById('sec-current-pin').value;
-      const newPin = document.getElementById('sec-new-pin').value;
-      const confirmPin = document.getElementById('sec-confirm-pin').value;
-
-      if (currentPin !== masterPin) { alert("Current PIN is incorrect."); return; }
-      if (!newPin || newPin.length < 4) { alert("New PIN must be at least 4 characters."); return; }
-      if (newPin !== confirmPin) { alert("New PINs do not match."); return; }
-
-      masterPin = newPin;
-      localStorage.setItem('crochet_master_pin', masterPin);
-      alert("Master PIN updated successfully!");
-      document.getElementById('sec-current-pin').value = '';
-      document.getElementById('sec-new-pin').value = '';
-      document.getElementById('sec-confirm-pin').value = '';
-    }
-
-    function closeInvoiceModal() {
-      document.getElementById('invoice-modal').classList.add('hidden');
-    }
-
-    function exportOrdersToCSV() {
-      if (orders.length === 0) { alert("No orders to export."); return; }
-      let csv = "Order ID,Customer Name,Phone,Address,Total\n";
-      orders.forEach(o => {
-        csv += `"${o.id}","${o.customer.name}","${o.customer.phone}","${o.customer.address}","${o.total}"\n`;
-      });
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = "customer_orders.csv";
-      a.click();
+      adminSettings.shopName = document.getElementById('set-shop-name').value;
+      adminSettings.tagline = document.getElementById('set-tagline').value;
+      adminSettings.whatsappNumber = document.getElementById('set-whatsapp').value;
+      adminSettings.announcementBanner = document.getElementById('set-announcement').value;
+      localStorage.setItem('crochet_settings', JSON.stringify(adminSettings));
+      alert("Store settings saved successfully!");
     }
   </script>
 </body>
