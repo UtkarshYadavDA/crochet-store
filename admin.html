@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard | Artisan Crochet Studio</title>
+  <title>Owner Dashboard | Private Store Management</title>
   <!-- Firebase SDKs (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
@@ -35,10 +35,10 @@
   <header class="bg-stone-900 text-white border-b border-stone-800 sticky top-0 z-30">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <span class="text-2xl">🔐</span>
+        <span class="text-2xl">🧶</span>
         <div>
-          <h1 class="font-serif font-bold text-lg sm:text-xl tracking-tight">Admin Control Panel</h1>
-          <p class="text-[10px] text-stone-400 uppercase tracking-widest font-medium">Artisan Crochet Studio</p>
+          <h1 class="font-serif font-bold text-lg sm:text-xl tracking-tight">Owner Dashboard</h1>
+          <p class="text-[10px] text-stone-400 uppercase tracking-widest font-medium">Private Store Management</p>
         </div>
       </div>
       <a href="index.html" target="_blank" class="bg-stone-800 hover:bg-stone-700 text-stone-200 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 border border-stone-700">
@@ -48,182 +48,204 @@
   </header>
 
   <!-- Main Container -->
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full space-y-10">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full space-y-8">
 
     <!-- Navigation Tabs -->
     <div class="flex flex-wrap gap-2 border-b border-cream-200 pb-4">
-      <button onclick="switchTab('products')" id="tab-btn-products" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-terracotta-500 text-white shadow-sm">🧶 Manage Products & Stock</button>
-      <button onclick="switchTab('orders')" id="tab-btn-orders" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">📦 Customer Orders</button>
-      <button onclick="switchTab('coupons')" id="tab-btn-coupons" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">🎟️ Discount Coupons</button>
-      <button onclick="switchTab('settings')" id="tab-btn-settings" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">⚙️ Store Settings & Banners</button>
+      <button onclick="switchTab('products')" id="tab-btn-products" class="px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-terracotta-500 text-white shadow-sm">🧶 Products & Stock</button>
+      <button onclick="switchTab('bundles')" id="tab-btn-bundles" class="px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">📦 Bundle Offers</button>
+      <button onclick="switchTab('orders')" id="tab-btn-orders" class="px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">🛍️ Customer Orders</button>
+      <button onclick="switchTab('banner')" id="tab-btn-banner" class="px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">⏳ Banner & Timer</button>
+      <button onclick="switchTab('security')" id="tab-btn-security" class="px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200">🔑 Security & PIN</button>
     </div>
 
-    <!-- TAB 1: PRODUCTS & STOCK MANAGEMENT -->
+    <!-- TAB 1: PRODUCTS & STOCK -->
     <section id="tab-content-products" class="space-y-6">
-      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h2 class="font-serif font-bold text-xl text-stone-900">Catalog & Live Stock Control</h2>
-            <p class="text-xs text-stone-500 mt-0.5">Toggle products in-stock or out-of-stock instantly, add new items, or edit details.</p>
-          </div>
-          <button onclick="openProductModal()" class="bg-sage-500 hover:bg-sage-600 text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5">
-            <span>➕</span> Add New Product
-          </button>
+      <!-- Manage Categories Card -->
+      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs space-y-4">
+        <h2 class="font-serif font-bold text-xl text-stone-900">📂 Manage Store Categories</h2>
+        <div class="flex flex-wrap gap-2 items-center">
+          <input type="text" id="new-category-input" placeholder="e.g. Keychains / Accessories" class="text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500 w-64">
+          <button onclick="addCategory()" class="bg-sage-500 hover:bg-sage-600 text-white font-semibold text-xs px-4 py-3 rounded-xl transition-all">+ Add Category</button>
         </div>
+        <div id="categories-pill-container" class="flex flex-wrap gap-2 pt-2"></div>
+      </div>
 
+      <!-- Add New Product Card -->
+      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="font-serif font-bold text-xl text-stone-900">+ Add New Crochet Product</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Product Title *</label>
+            <input type="text" id="prod-title" placeholder="e.g. Handmade Daisy Bouquet" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Category *</label>
+            <select id="prod-category" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500"></select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Offer Selling Price (₹) *</label>
+            <input type="number" id="prod-price" placeholder="699" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Original / Compare Price (₹) (Crossed Out)</label>
+            <input type="number" id="prod-original-price" placeholder="1499" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Sizes Options (Optional – comma separated)</label>
+            <input type="text" id="prod-sizes" placeholder="e.g. Small, Medium, Large" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Badge / Tag (Optional)</label>
+            <input type="text" id="prod-badge" placeholder="e.g. Limited Offer" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Product Description</label>
+            <textarea id="prod-desc" rows="2" placeholder="Write wonderful product details here..." class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500"></textarea>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Image URL *</label>
+            <input type="url" id="prod-image" placeholder="https://images.unsplash.com/..." class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          </div>
+          <div class="sm:col-span-2 flex items-center gap-3 bg-sand-100 p-3 rounded-xl border border-cream-200">
+            <input type="checkbox" id="prod-in-stock" checked class="w-4 h-4 text-terracotta-500 rounded border-cream-200 focus:ring-terracotta-500">
+            <label for="prod-in-stock" class="text-xs font-semibold text-stone-800 cursor-pointer">Product is In Stock (Uncheck to mark Out of Stock)</label>
+          </div>
+        </div>
+        <button onclick="saveNewProduct()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold text-xs px-6 py-3 rounded-xl shadow-xs transition-all">Save & Publish Product</button>
+      </div>
+
+      <!-- Existing Catalog Grid -->
+      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs space-y-4">
+        <h2 class="font-serif font-bold text-xl text-stone-900">Existing Catalog & Live Stock</h2>
         <div id="admin-product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
       </div>
     </section>
 
-    <!-- TAB 2: CUSTOMER ORDERS -->
+    <!-- TAB 2: BUNDLE OFFERS -->
+    <section id="tab-content-bundles" class="space-y-6 hidden">
+      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs space-y-4">
+        <h2 class="font-serif font-bold text-xl text-stone-900">📦 Bundle Offers & Discounts</h2>
+        <p class="text-xs text-stone-500">Configure special discount bundles or coupons for storewide promotions.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Coupon Code</label>
+            <input type="text" id="bundle-code" placeholder="WELCOME10" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none uppercase font-bold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Discount Percentage (%)</label>
+            <input type="number" id="bundle-discount" placeholder="10" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none">
+          </div>
+        </div>
+        <button onclick="saveBundleCoupon()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all">Save Coupon</button>
+        <div id="admin-bundles-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: CUSTOMER ORDERS -->
     <section id="tab-content-orders" class="space-y-6 hidden">
-      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs">
-        <h2 class="font-serif font-bold text-xl text-stone-900 mb-1">Customer Orders</h2>
-        <p class="text-xs text-stone-500 mb-6">Orders placed through WhatsApp checkout sync here automatically.</p>
+      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs space-y-4">
+        <h2 class="font-serif font-bold text-xl text-stone-900">🛍️ Customer Orders</h2>
+        <p class="text-xs text-stone-500">Orders placed through WhatsApp checkout sync here automatically.</p>
         <div id="admin-orders-list" class="space-y-4"></div>
       </div>
     </section>
 
-    <!-- TAB 3: DISCOUNT COUPONS -->
-    <section id="tab-content-coupons" class="space-y-6 hidden">
-      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <!-- TAB 4: BANNER & TIMER -->
+    <section id="tab-content-banner" class="space-y-6 hidden">
+      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs space-y-4">
+        <h2 class="font-serif font-bold text-xl text-stone-900">⏳ Announcement Banner & Timer</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <h2 class="font-serif font-bold text-xl text-stone-900 mb-1">Promo & Discount Codes</h2>
-            <p class="text-xs text-stone-500">Create and manage checkout coupons for your customers.</p>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Top Announcement Banner Text</label>
+            <input type="text" id="set-announcement" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none">
           </div>
-          <button onclick="openCouponModal()" class="bg-sage-500 hover:bg-sage-600 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition-all">➕ Create Coupon</button>
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">WhatsApp Phone Number</label>
+            <input type="text" id="set-whatsapp" placeholder="919876543210" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none">
+          </div>
         </div>
-        <div id="admin-coupons-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        <button onclick="saveBannerSettings()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all">Save Settings</button>
       </div>
     </section>
 
-    <!-- TAB 4: STORE SETTINGS & BANNERS -->
-    <section id="tab-content-settings" class="space-y-6 hidden">
-      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs space-y-6">
-        <div>
-          <h2 class="font-serif font-bold text-xl text-stone-900 mb-1">Store Settings & WhatsApp Config</h2>
-          <p class="text-xs text-stone-500">Configure your storefront details, headers, and WhatsApp order routing number.</p>
+    <!-- TAB 5: SECURITY & PIN -->
+    <section id="tab-content-security" class="space-y-6 hidden">
+      <div class="bg-white p-6 rounded-2xl border border-cream-200 shadow-xs space-y-4">
+        <h2 class="font-serif font-bold text-xl text-stone-900">🔑 Security & Admin PIN</h2>
+        <p class="text-xs text-stone-500">Change your secure access PIN for this dashboard.</p>
+        <div class="max-w-xs space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1">New Admin PIN</label>
+            <input type="password" id="new-admin-pin" placeholder="••••" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none">
+          </div>
+          <button onclick="saveAdminPin()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold text-xs px-6 py-3 rounded-xl transition-all">Update PIN</button>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1">Shop Name</label>
-            <input type="text" id="set-shop-name" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1">Tagline</label>
-            <input type="text" id="set-tagline" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1">WhatsApp Phone Number (with Country Code)</label>
-            <input type="text" id="set-whatsapp" placeholder="919876543210" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1">Top Announcement Banner Text</label>
-            <input type="text" id="set-announcement" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1">Hero Section Main Title</label>
-            <input type="text" id="set-hero-title" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1">Hero Section Subtitle</label>
-            <input type="text" id="set-hero-subtitle" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
-          </div>
-        </div>
-        <button onclick="saveStoreSettings()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold text-xs px-6 py-3 rounded-xl shadow-xs transition-all">Save Store Settings</button>
       </div>
     </section>
 
   </main>
 
-  <!-- ADD / EDIT PRODUCT MODAL -->
+  <!-- EDIT PRODUCT MODAL -->
   <div id="product-modal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 border border-cream-200 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between border-b border-cream-200 pb-3">
-        <h3 id="modal-title" class="font-serif font-bold text-lg text-stone-900">Add New Product</h3>
+        <h3 class="font-serif font-bold text-lg text-stone-900">Edit Product</h3>
         <button onclick="closeProductModal()" class="text-stone-400 hover:text-stone-800 text-xl font-bold">✕</button>
       </div>
-      
       <input type="hidden" id="edit-product-id">
-      
       <div class="space-y-3">
         <div>
           <label class="block text-xs font-semibold text-stone-600 mb-1">Product Title *</label>
-          <input type="text" id="prod-title" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          <input type="text" id="edit-prod-title" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1">Category *</label>
-            <input type="text" id="prod-category" placeholder="Bouquets, Bags..." class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+            <select id="edit-prod-category" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none"></select>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-stone-600 mb-1">Badge (Optional)</label>
-            <input type="text" id="prod-badge" placeholder="Trending, Limited..." class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+            <label class="block text-xs font-semibold text-stone-600 mb-1">Badge</label>
+            <input type="text" id="edit-prod-badge" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none">
           </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1">Selling Price (₹) *</label>
-            <input type="number" id="prod-price" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+            <input type="number" id="edit-prod-price" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none">
           </div>
           <div>
             <label class="block text-xs font-semibold text-stone-600 mb-1">Original Price (₹)</label>
-            <input type="number" id="prod-original-price" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+            <input type="number" id="edit-prod-original-price" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none">
           </div>
         </div>
         <div>
           <label class="block text-xs font-semibold text-stone-600 mb-1">Image URL *</label>
-          <input type="url" id="prod-image" placeholder="https://images.unsplash.com/..." class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          <input type="url" id="edit-prod-image" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none">
         </div>
         <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1">Available Sizes (Comma separated)</label>
-          <input type="text" id="prod-sizes" placeholder="Small, Medium, Large" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500">
+          <label class="block text-xs font-semibold text-stone-600 mb-1">Sizes</label>
+          <input type="text" id="edit-prod-sizes" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none">
         </div>
         <div>
           <label class="block text-xs font-semibold text-stone-600 mb-1">Description</label>
-          <textarea id="prod-desc" rows="2" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none focus:ring-1 focus:ring-terracotta-500"></textarea>
+          <textarea id="edit-prod-desc" rows="2" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none"></textarea>
         </div>
-        
-        <!-- Stock Toggle Checkbox -->
-        <div class="flex items-center gap-3 pt-2 bg-sand-100 p-3 rounded-xl border border-cream-200">
-          <input type="checkbox" id="prod-in-stock" checked class="w-4 h-4 text-terracotta-500 rounded border-cream-200 focus:ring-terracotta-500">
-          <label for="prod-in-stock" class="text-xs font-semibold text-stone-800 cursor-pointer">Product is In Stock (Uncheck to mark Out of Stock)</label>
+        <div class="flex items-center gap-3 bg-sand-100 p-3 rounded-xl border border-cream-200">
+          <input type="checkbox" id="edit-prod-in-stock" class="w-4 h-4 text-terracotta-500 rounded border-cream-200 focus:ring-terracotta-500">
+          <label for="edit-prod-in-stock" class="text-xs font-semibold text-stone-800 cursor-pointer">Product is In Stock</label>
         </div>
       </div>
-
       <div class="flex items-center justify-end gap-2 pt-3 border-t border-cream-200">
-        <button onclick="closeProductModal()" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-sand-100 text-stone-600 hover:bg-sand-200">Cancel</button>
-        <button onclick="saveProductData()" class="px-5 py-2.5 rounded-xl text-xs font-semibold bg-terracotta-500 hover:bg-terracotta-600 text-white shadow-xs">Save Product</button>
+        <button onclick="closeProductModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-sand-100 text-stone-600">Cancel</button>
+        <button onclick="updateProductData()" class="px-5 py-2 rounded-xl text-xs font-semibold bg-terracotta-500 text-white">Save Changes</button>
       </div>
     </div>
   </div>
 
-  <!-- COUPON MODAL -->
-  <div id="coupon-modal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 border border-cream-200 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-cream-200 pb-3">
-        <h3 class="font-serif font-bold text-lg text-stone-900">Create Coupon</h3>
-        <button onclick="closeCouponModal()" class="text-stone-400 hover:text-stone-800 text-xl font-bold">✕</button>
-      </div>
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1">Coupon Code</label>
-          <input type="text" id="coupon-code" placeholder="WELCOME10" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none uppercase font-bold">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-stone-600 mb-1">Discount Percentage (%)</label>
-          <input type="number" id="coupon-discount" placeholder="10" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-xl p-3 outline-none">
-        </div>
-      </div>
-      <div class="flex items-center justify-end gap-2 pt-3 border-t border-cream-200">
-        <button onclick="closeCouponModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-sand-100 text-stone-600">Cancel</button>
-        <button onclick="saveCoupon()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-terracotta-500 text-white">Save Coupon</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ADMIN SCRIPT -->
+  <!-- SCRIPT -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyCdQLc02N4y6W6XjBiBoGzNG-PVII1GyOI",
@@ -240,32 +262,27 @@
 
     let adminProducts = [];
     let adminOrders = [];
-    let adminCoupons = JSON.parse(localStorage.getItem('crochet_coupons')) || [
-      { code: 'WELCOME10', discount: 10 },
-      { code: 'CROCHET15', discount: 15 }
-    ];
+    let categories = JSON.parse(localStorage.getItem('crochet_categories')) || ["Bouquets", "Bags", "Amigurumi", "Wearables", "Home Decor"];
+    let adminCoupons = JSON.parse(localStorage.getItem('crochet_coupons')) || [{ code: 'WELCOME10', discount: 10 }];
     let adminSettings = JSON.parse(localStorage.getItem('crochet_settings')) || {
-      shopName: "Artisan Crochet",
-      tagline: "Handmade Studio",
-      whatsappNumber: "919876543210",
       announcementBanner: "✨ Free Shipping on orders over ₹1,499 | Handcrafted with Love in India ✨",
-      heroTitle: "Handcrafted Crochet Art, Made for You",
-      heroSubtitle: "Discover exquisite handmade bouquets, plushies, and bags crafted with meticulous detail and premium yarn."
+      whatsappNumber: "919876543210"
     };
 
     document.addEventListener("DOMContentLoaded", async () => {
-      loadSettingsUI();
+      renderCategories();
       renderCoupons();
+      loadSettingsUI();
       await fetchAdminData();
     });
 
     function switchTab(tabName) {
-      ['products', 'orders', 'coupons', 'settings'].forEach(t => {
+      ['products', 'bundles', 'orders', 'banner', 'security'].forEach(t => {
         document.getElementById(`tab-content-${t}`).classList.add('hidden');
-        document.getElementById(`tab-btn-${t}`).className = "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200";
+        document.getElementById(`tab-btn-${t}`).className = "px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-sand-100 text-stone-600 hover:bg-sand-200 border border-cream-200";
       });
       document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
-      document.getElementById(`tab-btn-${tabName}`).className = "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-terracotta-500 text-white shadow-sm";
+      document.getElementById(`tab-btn-${tabName}`).className = "px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-terracotta-500 text-white shadow-sm";
     }
 
     async function fetchAdminData() {
@@ -274,9 +291,7 @@
         adminProducts = [];
         prodSnap.forEach(doc => { adminProducts.push({ id: doc.id, ...doc.data() }); });
         renderAdminProducts();
-      } catch (err) {
-        console.error("Error fetching products:", err);
-      }
+      } catch (err) { console.error("Error fetching products:", err); }
 
       try {
         const orderSnap = await db.collection("orders").orderBy("createdAt", "desc").get();
@@ -284,23 +299,54 @@
         orderSnap.forEach(doc => { adminOrders.push(doc.data()); });
         renderAdminOrders();
       } catch (err) {
-        console.error("Error fetching orders:", err);
         adminOrders = JSON.parse(localStorage.getItem('crochet_orders')) || [];
         renderAdminOrders();
       }
     }
 
+    function renderCategories() {
+      const container = document.getElementById('categories-pill-container');
+      const select1 = document.getElementById('prod-category');
+      const select2 = document.getElementById('edit-prod-category');
+      
+      container.innerHTML = categories.map((cat, idx) => `
+        <span class="bg-sand-100 border border-cream-200 text-stone-700 text-xs px-3 py-1.5 rounded-full flex items-center gap-2 font-semibold">
+          ${cat} <button onclick="deleteCategory(${idx})" class="text-stone-400 hover:text-red-600">×</button>
+        </span>
+      `).join('');
+
+      const optionsHtml = categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+      select1.innerHTML = optionsHtml;
+      select2.innerHTML = optionsHtml;
+    }
+
+    function addCategory() {
+      const val = document.getElementById('new-category-input').value.trim();
+      if(!val) return;
+      if(!categories.includes(val)) {
+        categories.push(val);
+        localStorage.setItem('crochet_categories', JSON.stringify(categories));
+        document.getElementById('new-category-input').value = "";
+        renderCategories();
+      }
+    }
+
+    function deleteCategory(index) {
+      categories.splice(index, 1);
+      localStorage.setItem('crochet_categories', JSON.stringify(categories));
+      renderCategories();
+    }
+
     function renderAdminProducts() {
       const grid = document.getElementById('admin-product-grid');
       if (adminProducts.length === 0) {
-        grid.innerHTML = `<p class="text-xs text-stone-400 col-span-full text-center py-8">No products found. Click 'Add New Product' above.</p>`;
+        grid.innerHTML = `<p class="text-xs text-stone-400 col-span-full text-center py-8">No products found.</p>`;
         return;
       }
-
       grid.innerHTML = adminProducts.map(p => {
         const isStock = p.inStock !== false;
         return `
-          <div class="bg-sand-100 rounded-2xl border border-cream-200 p-4 flex flex-col justify-between shadow-2xs">
+          <div class="bg-sand-100 rounded-2xl border border-cream-200 p-4 flex flex-col justify-between">
             <div>
               <div class="relative h-40 rounded-xl overflow-hidden bg-cream-100 mb-3">
                 <img src="${p.image}" alt="${p.title}" class="w-full h-full object-cover ${!isStock ? 'grayscale opacity-50' : ''}">
@@ -312,14 +358,13 @@
               <h3 class="font-serif font-bold text-sm text-stone-900 truncate">${p.title}</h3>
               <p class="text-xs font-bold text-terracotta-500 mt-0.5">₹${p.price}</p>
             </div>
-
             <div class="mt-4 pt-3 border-t border-cream-200 flex items-center justify-between gap-2">
               <button onclick="toggleStockStatus('${p.id}', ${!isStock})" class="flex-grow text-[10px] font-bold py-2 px-2 rounded-xl border transition-all ${
                 isStock ? 'bg-stone-100 hover:bg-stone-200 text-stone-700 border-cream-200' : 'bg-sage-500 hover:bg-sage-600 text-white border-sage-600'
               }">
                 ${isStock ? 'Mark Out of Stock' : 'Mark In Stock'}
               </button>
-              <button onclick="openEditProductModal('${p.id}')" class="bg-white hover:bg-cream-50 text-stone-700 border border-cream-200 text-xs px-3 py-2 rounded-xl font-semibold">Edit</button>
+              <button onclick="openEditModal('${p.id}')" class="bg-white hover:bg-cream-50 text-stone-700 border border-cream-200 text-xs px-3 py-2 rounded-xl font-semibold">Edit</button>
               <button onclick="deleteProduct('${p.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs px-2.5 py-2 rounded-xl font-semibold">🗑️</button>
             </div>
           </div>
@@ -333,10 +378,113 @@
         const prod = adminProducts.find(p => p.id === productId);
         if (prod) prod.inStock = newStockState;
         renderAdminProducts();
-      } catch (err) {
-        console.error("Error updating stock status:", err);
-        alert("Failed to update stock status in Firebase.");
-      }
+      } catch (err) { alert("Failed to update stock status in Firebase."); }
+    }
+
+    async function saveNewProduct() {
+      const title = document.getElementById('prod-title').value.trim();
+      const category = document.getElementById('prod-category').value;
+      const price = Number(document.getElementById('prod-price').value);
+      const originalPrice = Number(document.getElementById('prod-original-price').value) || 0;
+      const sizes = document.getElementById('prod-sizes').value.trim();
+      const badge = document.getElementById('prod-badge').value.trim();
+      const description = document.getElementById('prod-desc').value.trim();
+      const image = document.getElementById('prod-image').value.trim();
+      const inStock = document.getElementById('prod-in-stock').checked;
+
+      if(!title || !price || !image) { alert("Please fill required fields."); return; }
+      const prodId = 'p_' + Date.now();
+      const prodObj = { id: prodId, title, category, price, originalPrice, sizes, badge, description, image, inStock };
+
+      try {
+        await db.collection("products").doc(prodId).set(prodObj);
+        document.getElementById('prod-title').value = "";
+        document.getElementById('prod-price').value = "";
+        document.getElementById('prod-original-price').value = "";
+        document.getElementById('prod-sizes').value = "";
+        document.getElementById('prod-badge').value = "";
+        document.getElementById('prod-desc').value = "";
+        document.getElementById('prod-image').value = "";
+        await fetchAdminData();
+        alert("Product published successfully!");
+      } catch (err) { alert("Error saving to Firebase."); }
+    }
+
+    function openEditModal(productId) {
+      const p = adminProducts.find(item => item.id === productId);
+      if(!p) return;
+      document.getElementById('edit-product-id').value = p.id;
+      document.getElementById('edit-prod-title').value = p.title;
+      document.getElementById('edit-prod-category').value = p.category;
+      document.getElementById('edit-prod-price').value = p.price;
+      document.getElementById('edit-prod-original-price').value = p.originalPrice || "";
+      document.getElementById('edit-prod-image').value = p.image;
+      document.getElementById('edit-prod-sizes').value = p.sizes || "";
+      document.getElementById('edit-prod-badge').value = p.badge || "";
+      document.getElementById('edit-prod-desc').value = p.description || "";
+      document.getElementById('edit-prod-in-stock').checked = p.inStock !== false;
+      document.getElementById('product-modal').classList.remove('hidden');
+    }
+
+    function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
+
+    async function updateProductData() {
+      const id = document.getElementById('edit-product-id').value;
+      const title = document.getElementById('edit-prod-title').value.trim();
+      const category = document.getElementById('edit-prod-category').value;
+      const price = Number(document.getElementById('edit-prod-price').value);
+      const originalPrice = Number(document.getElementById('edit-prod-original-price').value) || 0;
+      const image = document.getElementById('edit-prod-image').value.trim();
+      const sizes = document.getElementById('edit-prod-sizes').value.trim();
+      const badge = document.getElementById('edit-prod-badge').value.trim();
+      const description = document.getElementById('edit-prod-desc').value.trim();
+      const inStock = document.getElementById('edit-prod-in-stock').checked;
+
+      try {
+        await db.collection("products").doc(id).set({ id, title, category, price, originalPrice, image, sizes, badge, description, inStock });
+        closeProductModal();
+        await fetchAdminData();
+        alert("Product updated successfully!");
+      } catch (err) { alert("Error updating product."); }
+    }
+
+    async function deleteProduct(id) {
+      if(!confirm("Delete this product?")) return;
+      try {
+        await db.collection("products").doc(id).delete();
+        await fetchAdminData();
+      } catch (err) { alert("Error deleting product."); }
+    }
+
+    function renderCoupons() {
+      const container = document.getElementById('admin-bundles-list');
+      container.innerHTML = adminCoupons.map((c, i) => `
+        <div class="bg-sand-100 p-4 rounded-2xl border border-cream-200 flex items-center justify-between">
+          <div>
+            <span class="font-bold text-sm text-stone-900 uppercase">${c.code}</span>
+            <span class="text-xs text-sage-600 block font-semibold">${c.discount}% OFF</span>
+          </div>
+          <button onclick="deleteCoupon(${i})" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 bg-red-50 rounded-lg">Delete</button>
+        </div>
+      `).join('');
+    }
+
+    function saveBundleCoupon() {
+      const code = document.getElementById('bundle-code').value.trim().toUpperCase();
+      const discount = Number(document.getElementById('bundle-discount').value);
+      if(!code || !discount) return;
+      adminCoupons.push({ code, discount });
+      localStorage.setItem('crochet_coupons', JSON.stringify(adminCoupons));
+      renderCoupons();
+      document.getElementById('bundle-code').value = "";
+      document.getElementById('bundle-discount').value = "";
+      alert("Coupon saved!");
+    }
+
+    function deleteCoupon(i) {
+      adminCoupons.splice(i, 1);
+      localStorage.setItem('crochet_coupons', JSON.stringify(adminCoupons));
+      renderCoupons();
     }
 
     function renderAdminOrders() {
@@ -345,171 +493,38 @@
         container.innerHTML = `<p class="text-xs text-stone-400 text-center py-8">No customer orders recorded yet.</p>`;
         return;
       }
-
       container.innerHTML = adminOrders.map(o => `
         <div class="bg-sand-100 p-4 rounded-2xl border border-cream-200 space-y-3">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-cream-200 pb-2">
-            <div>
-              <span class="font-bold text-xs text-terracotta-600">${o.orderId}</span>
-              <span class="text-xs text-stone-400 ml-2">${o.date || 'Recent'}</span>
-            </div>
-            <span class="bg-sage-500/10 text-sage-700 font-semibold text-[10px] px-2.5 py-1 rounded-full border border-sage-500/20 w-fit">Status: ${o.status || 'Pending'}</span>
+          <div class="flex justify-between border-b border-cream-200 pb-2">
+            <span class="font-bold text-xs text-terracotta-600">${o.orderId}</span>
+            <span class="text-xs text-stone-400">${o.date || 'Recent'}</span>
           </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-stone-700">
-            <div><span class="font-semibold text-stone-500">Customer:</span> ${o.customerName}</div>
-            <div><span class="font-semibold text-stone-500">Phone:</span> ${o.customerPhone}</div>
-            <div class="sm:col-span-2"><span class="font-semibold text-stone-500">Address:</span> ${o.deliveryAddress}</div>
-          </div>
-
-          <div class="bg-white p-3 rounded-xl border border-cream-200 text-xs space-y-1">
-            <p class="font-bold text-stone-800 mb-1">Items Ordered:</p>
-            ${o.items.map(item => `
-              <div class="flex justify-between text-stone-600">
-                <span>• ${item.title} (${item.size}) x${item.quantity}</span>
-                <span class="font-semibold">₹${item.lineTotal}</span>
-              </div>
-            `).join('')}
-            <div class="pt-2 border-t border-cream-200 flex justify-between font-bold text-stone-900">
-              <span>Total Amount:</span>
-              <span class="text-terracotta-600">₹${o.totalAmount}</span>
-            </div>
+          <div class="grid grid-cols-2 text-xs text-stone-700">
+            <div><span class="font-semibold">Customer:</span> ${o.customerName}</div>
+            <div><span class="font-semibold">Phone:</span> ${o.customerPhone}</div>
           </div>
         </div>
       `).join('');
-    }
-
-    function renderCoupons() {
-      const container = document.getElementById('admin-coupons-list');
-      if (adminCoupons.length === 0) {
-        container.innerHTML = `<p class="text-xs text-stone-400 col-span-full">No coupons created yet.</p>`;
-        return;
-      }
-      container.innerHTML = adminCoupons.map((c, index) => `
-        <div class="bg-sand-100 p-4 rounded-2xl border border-cream-200 flex items-center justify-between">
-          <div>
-            <span class="font-bold text-sm text-stone-900 uppercase">${c.code}</span>
-            <span class="text-xs text-sage-600 block font-semibold">${c.discount}% OFF</span>
-          </div>
-          <button onclick="deleteCoupon(${index})" class="text-red-500 hover:text-red-700 text-xs font-semibold px-2 py-1 bg-red-50 rounded-lg">Delete</button>
-        </div>
-      `).join('');
-    }
-
-    function openCouponModal() { document.getElementById('coupon-modal').classList.remove('hidden'); }
-    function closeCouponModal() { document.getElementById('coupon-modal').classList.add('hidden'); }
-
-    function saveCoupon() {
-      const code = document.getElementById('coupon-code').value.trim().toUpperCase();
-      const discount = Number(document.getElementById('coupon-discount').value);
-      if(!code || !discount) { alert("Please enter both code and discount."); return; }
-      adminCoupons.push({ code, discount });
-      localStorage.setItem('crochet_coupons', JSON.stringify(adminCoupons));
-      closeCouponModal();
-      renderCoupons();
-    }
-
-    function deleteCoupon(index) {
-      adminCoupons.splice(index, 1);
-      localStorage.setItem('crochet_coupons', JSON.stringify(adminCoupons));
-      renderCoupons();
-    }
-
-    function openProductModal() {
-      document.getElementById('modal-title').innerText = "Add New Product";
-      document.getElementById('edit-product-id').value = "";
-      document.getElementById('prod-title').value = "";
-      document.getElementById('prod-category').value = "";
-      document.getElementById('prod-badge').value = "";
-      document.getElementById('prod-price').value = "";
-      document.getElementById('prod-original-price').value = "";
-      document.getElementById('prod-image').value = "";
-      document.getElementById('prod-sizes').value = "Standard";
-      document.getElementById('prod-desc').value = "";
-      document.getElementById('prod-in-stock').checked = true;
-      document.getElementById('product-modal').classList.remove('hidden');
-    }
-
-    function openEditProductModal(productId) {
-      const p = adminProducts.find(item => item.id === productId);
-      if (!p) return;
-      document.getElementById('modal-title').innerText = "Edit Product";
-      document.getElementById('edit-product-id').value = p.id;
-      document.getElementById('prod-title').value = p.title;
-      document.getElementById('prod-category').value = p.category;
-      document.getElementById('prod-badge').value = p.badge || "";
-      document.getElementById('prod-price').value = p.price;
-      document.getElementById('prod-original-price').value = p.originalPrice || "";
-      document.getElementById('prod-image').value = p.image;
-      document.getElementById('prod-sizes').value = p.sizes || "";
-      document.getElementById('prod-desc').value = p.description || "";
-      document.getElementById('prod-in-stock').checked = p.inStock !== false;
-      document.getElementById('product-modal').classList.remove('hidden');
-    }
-
-    function closeProductModal() {
-      document.getElementById('product-modal').classList.add('hidden');
-    }
-
-    async function saveProductData() {
-      const editId = document.getElementById('edit-product-id').value;
-      const title = document.getElementById('prod-title').value.trim();
-      const category = document.getElementById('prod-category').value.trim();
-      const price = Number(document.getElementById('prod-price').value);
-      const originalPrice = Number(document.getElementById('prod-original-price').value) || 0;
-      const image = document.getElementById('prod-image').value.trim();
-      const badge = document.getElementById('prod-badge').value.trim();
-      const sizes = document.getElementById('prod-sizes').value.trim();
-      const description = document.getElementById('prod-desc').value.trim();
-      const inStock = document.getElementById('prod-in-stock').checked;
-
-      if (!title || !category || !price || !image) {
-        alert("Please fill in all required fields (Title, Category, Price, Image URL).");
-        return;
-      }
-
-      const prodId = editId ? editId : 'p_' + Date.now();
-      const productObj = { id: prodId, title, category, price, originalPrice, image, badge, sizes, description, inStock };
-
-      try {
-        await db.collection("products").doc(prodId).set(productObj);
-        closeProductModal();
-        await fetchAdminData();
-        alert("Product saved successfully to database!");
-      } catch (err) {
-        console.error("Error saving product:", err);
-        alert("Error saving product to Firebase.");
-      }
-    }
-
-    async function deleteProduct(productId) {
-      if (!confirm("Are you sure you want to delete this product?")) return;
-      try {
-        await db.collection("products").doc(productId).delete();
-        await fetchAdminData();
-      } catch (err) {
-        console.error("Error deleting product:", err);
-      }
     }
 
     function loadSettingsUI() {
-      document.getElementById('set-shop-name').value = adminSettings.shopName || "";
-      document.getElementById('set-tagline').value = adminSettings.tagline || "";
-      document.getElementById('set-whatsapp').value = adminSettings.whatsappNumber || "";
       document.getElementById('set-announcement').value = adminSettings.announcementBanner || "";
-      document.getElementById('set-hero-title').value = adminSettings.heroTitle || "";
-      document.getElementById('set-hero-subtitle').value = adminSettings.heroSubtitle || "";
+      document.getElementById('set-whatsapp').value = adminSettings.whatsappNumber || "";
     }
 
-    function saveStoreSettings() {
-      adminSettings.shopName = document.getElementById('set-shop-name').value;
-      adminSettings.tagline = document.getElementById('set-tagline').value;
-      adminSettings.whatsappNumber = document.getElementById('set-whatsapp').value;
+    function saveBannerSettings() {
       adminSettings.announcementBanner = document.getElementById('set-announcement').value;
-      adminSettings.heroTitle = document.getElementById('set-hero-title').value;
-      adminSettings.heroSubtitle = document.getElementById('set-hero-subtitle').value;
+      adminSettings.whatsappNumber = document.getElementById('set-whatsapp').value;
       localStorage.setItem('crochet_settings', JSON.stringify(adminSettings));
-      alert("Store settings saved successfully!");
+      alert("Settings saved!");
+    }
+
+    function saveAdminPin() {
+      const pin = document.getElementById('new-admin-pin').value.trim();
+      if(!pin) return;
+      localStorage.setItem('crochet_admin_pin', pin);
+      alert("Admin PIN updated successfully!");
+      document.getElementById('new-admin-pin').value = "";
     }
   </script>
 </body>
