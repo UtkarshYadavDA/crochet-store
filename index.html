@@ -4,8 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Artisan Crochet Studio | Handcrafted with Love</title>
+  <!-- Firebase SDKs (Compat Version) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
@@ -92,7 +95,6 @@
 
   <!-- Main Content & Catalog -->
   <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full">
-    
     <!-- Category Tabs -->
     <div id="category-container" class="flex flex-wrap items-center justify-center gap-2 mb-8"></div>
 
@@ -175,28 +177,22 @@
 
   <!-- Application Logic JavaScript -->
   <script>
+    // Firebase Configuration Initialization (Compat version)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdQLc02N4y6W6XjBiBoGzNG-PVII1GyOI",
+      authDomain: "crochet-website04.firebaseapp.com",
+      projectId: "crochet-website04",
+      storageBucket: "crochet-website04.firebasestorage.app",
+      messagingSenderId: "437393217410",
+      appId: "1:437393217410:web:bdb6bd9a69e916e875e19b",
+      measurementId: "G-7EHXSXZ71M"
+    };
 
-    // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCdQLc02N4y6W6XjBiBoGzNG-PVII1GyOI",
-  authDomain: "crochet-website04.firebaseapp.com",
-  projectId: "crochet-website04",
-  storageBucket: "crochet-website04.firebasestorage.app",
-  messagingSenderId: "437393217410",
-  appId: "1:437393217410:web:bdb6bd9a69e916e875e19b",
-  measurementId: "G-7EHXSXZ71M"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const analytics = firebase.analytics();
     
     const defaultProducts = [
       {
@@ -399,7 +395,6 @@ const analytics = getAnalytics(app);
         selectedSize = sizeEl.value;
       }
 
-      // Check if exact product + size already in cart
       const cartItemKey = productId + "_" + selectedSize;
       const existing = cart.find(item => (item.id + "_" + (item.size || "Standard")) === cartItemKey);
 
