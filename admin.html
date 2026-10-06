@@ -1,10 +1,209 @@
-// --- ALWAYS REQUIRE PIN ON REFRESH ---
-    const ADMIN_PIN = "9457"; // Change this if you want a different PIN
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Control Center | Artisan Crochet Studio</title>
+  <!-- Firebase SDKs (Compat Version) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: { 50: '#FAF6F0', 100: '#F4EFE6', 200: '#E8DFD1' },
+            terracotta: { 500: '#C86D51', 600: '#B0593E' },
+            sage: { 500: '#728C69', 600: '#5C7353' },
+            sand: { 100: '#FFFDF9', 200: '#F5EFEB' }
+          },
+          fontFamily: {
+            serif: ['Playfair Display', 'serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-cream-50 font-sans text-stone-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-cream-200 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">⚙️</span>
+        <div>
+          <h1 class="font-serif font-bold text-xl text-stone-900">Admin Control Center</h1>
+          <p class="text-xs text-stone-500">Manage catalog, stock status, orders & live site copy in Firestore</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="index.html" target="_blank" class="bg-sand-100 hover:bg-sand-200 border border-cream-200 text-stone-800 px-4 py-2 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5">
+          <span>🌐</span> View Storefront
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full space-y-10">
+
+    <!-- Section 1: Customer Orders Management -->
+    <section class="bg-white rounded-2xl border border-cream-200 p-6 shadow-xs">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="font-serif font-bold text-lg text-stone-900">📦 Customer Orders & Details</h2>
+          <p class="text-xs text-stone-500">Review incoming customer orders and shipping addresses stored in database.</p>
+        </div>
+        <button onclick="loadOrders()" class="bg-cream-100 hover:bg-cream-200 text-stone-700 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors">🔄 Refresh Orders</button>
+      </div>
+      <div id="orders-container" class="space-y-4">
+        <p class="text-xs text-stone-400 text-center py-6">Loading orders from database...</p>
+      </div>
+    </section>
+
+    <!-- Section 2: Product & Stock Management -->
+    <section class="bg-white rounded-2xl border border-cream-200 p-6 shadow-xs">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h2 class="font-serif font-bold text-lg text-stone-900">🧶 Product Catalog & Stock Levels</h2>
+          <p class="text-xs text-stone-500">Add products or toggle items between In-Stock and Out-of-Stock instantly.</p>
+        </div>
+        <button onclick="openProductModal()" class="bg-terracotta-500 hover:bg-terracotta-600 text-white font-medium text-xs px-4 py-2.5 rounded-xl shadow-xs transition-colors">
+          + Add New Product
+        </button>
+      </div>
+      <div id="admin-product-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <p class="text-xs text-stone-400 col-span-full text-center py-6">Loading products...</p>
+      </div>
+    </section>
+
+    <!-- Section 3: Bundle Offers & Live Store Customization -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Offers -->
+      <section class="bg-white rounded-2xl border border-cream-200 p-6 shadow-xs">
+        <h2 class="font-serif font-bold text-lg text-stone-900 mb-1">🎁 Bundle Discounts</h2>
+        <p class="text-xs text-stone-500 mb-4">Manage bulk quantity discount deals.</p>
+        <div id="admin-offers-list" class="space-y-3 mb-4"></div>
+        <div class="grid grid-cols-3 gap-2 pt-3 border-t border-cream-200">
+          <input type="number" id="new-offer-qty" placeholder="Min Qty" class="text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+          <input type="number" id="new-offer-price" placeholder="Bundle Price" class="text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+          <button onclick="addNewOffer()" class="bg-sage-500 hover:bg-sage-600 text-white font-semibold text-xs py-2.5 rounded-lg transition-colors">+ Add Offer</button>
+        </div>
+      </section>
+
+      <!-- Live Store Text & Branding Settings -->
+      <section class="bg-white rounded-2xl border border-cream-200 p-6 shadow-xs">
+        <h2 class="font-serif font-bold text-lg text-stone-900 mb-1">🛠 Live Store Text & Branding</h2>
+        <p class="text-xs text-stone-500 mb-4">Change site names, logos, announcements, and footers instantly.</p>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Store Name / Title:</label>
+            <input type="text" id="setting-store-name" placeholder="e.g. Artisan Crochet Studio" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Logo Image URL (or emoji/icon):</label>
+            <input type="text" id="setting-logo" placeholder="https://... or 🧶" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Announcement Banner Text:</label>
+            <input type="text" id="setting-banner" placeholder="Free shipping on orders above ₹999!" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">WhatsApp Phone Number (with Country Code):</label>
+            <input type="text" id="setting-whatsapp" placeholder="919876543210" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Footer Copyright Text:</label>
+            <input type="text" id="setting-footer" placeholder="Handcrafted with love." class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+          </div>
+          <button onclick="saveStoreSettings()" class="w-full bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs py-2.5 rounded-xl transition-colors">Save All Live Settings</button>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- Product Edit / Add Modal -->
+  <div id="product-modal" class="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-4 border-b border-cream-200 pb-3">
+        <h3 id="modal-title" class="font-serif font-bold text-lg text-stone-900">Add / Edit Product</h3>
+        <button onclick="closeProductModal()" class="text-stone-400 hover:text-stone-800 text-xl font-bold">✕</button>
+      </div>
+      <form id="product-form" onsubmit="saveProduct(event)" class="space-y-3">
+        <input type="hidden" id="edit-prod-id">
+        <div>
+          <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Product Title *</label>
+          <input type="text" id="edit-prod-title" required class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Category *</label>
+            <select id="edit-prod-category" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+              <option value="Bouquets">Bouquets</option>
+              <option value="Bags">Bags</option>
+              <option value="Amigurumi">Amigurumi</option>
+              <option value="Wearables">Wearables</option>
+              <option value="Home Decor">Home Decor</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Stock Status *</label>
+            <select id="edit-prod-stock" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+              <option value="true">🟢 In Stock</option>
+              <option value="false">🔴 Out of Stock</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Price (₹) *</label>
+            <input type="number" id="edit-prod-price" required class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Original Price (₹)</label>
+            <input type="number" id="edit-prod-orig-price" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Image URL *</label>
+          <input type="url" id="edit-prod-image" required class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+        </div>
+        <div>
+          <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Sizes (comma separated)</label>
+          <input type="text" id="edit-prod-sizes" placeholder="Standard, Large" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+        </div>
+        <div>
+          <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Badge</label>
+          <input type="text" id="edit-prod-badge" class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none">
+        </div>
+        <div>
+          <label class="block text-[10px] font-semibold text-stone-500 uppercase mb-1">Description *</label>
+          <textarea id="edit-prod-desc" rows="2" required class="w-full text-xs bg-cream-50 border border-cream-200 rounded-lg p-2.5 outline-none"></textarea>
+        </div>
+        <button type="submit" class="w-full bg-terracotta-500 hover:bg-terracotta-600 text-white font-semibold py-3 rounded-xl text-xs">Save Product to Database</button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="bg-white border-t border-cream-200 py-6 text-center text-xs text-stone-500 mt-12">
+    Admin Control Panel • Connected to Firebase Firestore Database
+  </footer>
+
+  <!-- Script Logic -->
+  <script>
+    // --- ALWAYS REQUIRE PIN ON EVERY LOAD / REFRESH ---
+    const ADMIN_PIN = "7887";
 
     function verifyAdminAccess() {
       let attempts = 3;
       while (attempts > 0) {
-        let enteredPin = prompt("🔒 Restricted Admin Access\nEnter your security PIN:");
+        let enteredPin = prompt("🔒 Restricted Admin Access\nEnter your 4-digit security PIN:");
         
         if (enteredPin === null) {
           document.body.innerHTML = `<div style="text-align:center; margin-top:20vh; font-family:sans-serif;">
@@ -16,7 +215,7 @@
         }
 
         if (enteredPin === ADMIN_PIN) {
-          return; // Access granted for this view instance
+          return; // Access granted for this view instance only
         } else {
           attempts--;
           if (attempts > 0) {
@@ -35,3 +234,208 @@
 
     // Run security check immediately on every load/refresh
     verifyAdminAccess();
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCdQLc02N4y6W6XjBiBoGzNG-PVII1GyOI",
+      authDomain: "crochet-website04.firebaseapp.com",
+      projectId: "crochet-website04",
+      storageBucket: "crochet-website04.firebasestorage.app",
+      messagingSenderId: "437393217410",
+      appId: "1:437393217410:web:bdb6bd9a69e916e875e19b",
+      measurementId: "G-7EHXSXZ71M"
+    };
+
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+    const db = firebase.firestore();
+
+    let products = [];
+    let offersList = [];
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await loadAdminData();
+      loadOrders();
+    });
+
+    async function loadAdminData() {
+      try {
+        const settingsDoc = await db.collection('settings').doc('config').get();
+        if (settingsDoc.exists) {
+          const s = settingsDoc.data();
+          document.getElementById('setting-store-name').value = s.storeName || '';
+          document.getElementById('setting-logo').value = s.logoUrl || '';
+          document.getElementById('setting-banner').value = s.announcementBanner || '';
+          document.getElementById('setting-whatsapp').value = s.whatsappNumber || '';
+          document.getElementById('setting-footer').value = s.footerText || '';
+        }
+
+        const prodSnap = await db.collection('products').get();
+        products = prodSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderAdminProducts();
+
+        const offerSnap = await db.collection('offers').get();
+        offersList = offerSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderAdminOffers();
+      } catch (error) {
+        console.error("Error loading admin data:", error);
+      }
+    }
+
+    async function loadOrders() {
+      const container = document.getElementById('orders-container');
+      try {
+        const orderSnap = await db.collection('orders').orderBy('timestamp', 'desc').get();
+        if (orderSnap.empty) {
+          container.innerHTML = `<p class="text-xs text-stone-400 text-center py-6">No customer orders recorded yet.</p>`;
+          return;
+        }
+        container.innerHTML = orderSnap.docs.map(doc => {
+          const ord = doc.data();
+          const itemsHtml = ord.items ? ord.items.map(i => `<li class="text-xs text-stone-600">• ${i.title} (${i.size || 'Standard'}) x ${i.qty} - ₹${i.price * i.qty}</li>`).join('') : '';
+          return `
+            <div class="bg-cream-50 border border-cream-200 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-xs bg-terracotta-500 text-white px-2 py-0.5 rounded">${ord.id}</span>
+                  <span class="text-xs text-stone-500">${ord.date || ''}</span>
+                </div>
+                <p class="text-xs font-bold text-stone-900 mt-1">👤 ${ord.customer?.name} | 📞 ${ord.customer?.phone}</p>
+                <p class="text-xs text-stone-600">📍 ${ord.customer?.address}</p>
+                <ul class="mt-2 space-y-0.5">${itemsHtml}</ul>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <p class="text-xs text-stone-400">Total</p>
+                <p class="font-serif font-bold text-lg text-terracotta-600">₹${ord.total}</p>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (error) {
+        container.innerHTML = `<p class="text-xs text-red-500 text-center py-6">Failed to load orders.</p>`;
+      }
+    }
+
+    function renderAdminProducts() {
+      const grid = document.getElementById('admin-product-grid');
+      if (products.length === 0) {
+        grid.innerHTML = `<p class="text-xs text-stone-400 col-span-full text-center py-6">No products found.</p>`;
+        return;
+      }
+      grid.innerHTML = products.map(p => {
+        const inStock = p.inStock !== false;
+        return `
+          <div class="bg-cream-50 border border-cream-200 rounded-xl p-4 flex gap-3 items-center">
+            <img src="${p.image}" alt="${p.title}" class="w-16 h-16 object-cover rounded-lg bg-cream-200 flex-shrink-0">
+            <div class="flex-grow min-w-0">
+              <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${inStock ? 'bg-sage-500/10 text-sage-700' : 'bg-red-500/10 text-red-600'}">${inStock ? 'In Stock' : 'Out of Stock'}</span>
+              <h4 class="font-serif font-bold text-xs text-stone-900 truncate mt-1">${p.title}</h4>
+              <p class="text-terracotta-600 font-bold text-xs">₹${p.price}</p>
+            </div>
+            <div class="flex flex-col gap-1.5 flex-shrink-0">
+              <button onclick="editProduct('${p.id}')" class="bg-white border border-cream-200 text-stone-800 text-[10px] font-semibold px-3 py-1.5 rounded-lg">Edit</button>
+              <button onclick="toggleStockStatus('${p.id}')" class="text-[10px] font-semibold px-3 py-1.5 rounded-lg ${inStock ? 'bg-red-100 text-red-700' : 'bg-sage-100 text-sage-700'}">${inStock ? 'Set Out' : 'Set In'}</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAdminOffers() {
+      const container = document.getElementById('admin-offers-list');
+      container.innerHTML = offersList.map(o => `
+        <div class="flex items-center justify-between bg-cream-50 p-2.5 rounded-xl border border-cream-200 text-xs">
+          <div>
+            <span class="font-bold text-stone-900">${o.title}</span>
+            <p class="text-[10px] text-stone-500">Buy ${o.minQty}+ for ₹${o.bundlePrice}</p>
+          </div>
+          <button onclick="deleteOffer('${o.id}')" class="text-red-500 font-bold px-2 py-1">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function openProductModal(productId = null) {
+      document.getElementById('product-modal').classList.remove('hidden');
+      if (productId) {
+        const p = products.find(x => x.id === productId);
+        if (!p) return;
+        document.getElementById('modal-title').innerText = "Edit Product";
+        document.getElementById('edit-prod-id').value = p.id;
+        document.getElementById('edit-prod-title').value = p.title;
+        document.getElementById('edit-prod-category').value = p.category;
+        document.getElementById('edit-prod-stock').value = p.inStock !== false ? "true" : "false";
+        document.getElementById('edit-prod-price').value = p.price;
+        document.getElementById('edit-prod-orig-price').value = p.originalPrice || '';
+        document.getElementById('edit-prod-image').value = p.image;
+        document.getElementById('edit-prod-sizes').value = p.sizes || '';
+        document.getElementById('edit-prod-badge').value = p.badge || '';
+        document.getElementById('edit-prod-desc').value = p.description;
+      } else {
+        document.getElementById('modal-title').innerText = "Add New Product";
+        document.getElementById('product-form').reset();
+        document.getElementById('edit-prod-id').value = '';
+        document.getElementById('edit-prod-stock').value = "true";
+      }
+    }
+
+    function closeProductModal() { document.getElementById('product-modal').classList.add('hidden'); }
+    function editProduct(id) { openProductModal(id); }
+
+    async function toggleStockStatus(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      const newStatus = p.inStock === false ? true : false;
+      await db.collection('products').doc(id).update({ inStock: newStatus });
+      p.inStock = newStatus;
+      renderAdminProducts();
+    }
+
+    async function saveProduct(event) {
+      event.preventDefault();
+      const id = document.getElementById('edit-prod-id').value || 'p_' + Date.now();
+      const productData = {
+        title: document.getElementById('edit-prod-title').value,
+        category: document.getElementById('edit-prod-category').value,
+        inStock: document.getElementById('edit-prod-stock').value === "true",
+        price: Number(document.getElementById('edit-prod-price').value),
+        originalPrice: Number(document.getElementById('edit-prod-orig-price').value) || 0,
+        image: document.getElementById('edit-prod-image').value,
+        sizes: document.getElementById('edit-prod-sizes').value,
+        badge: document.getElementById('edit-prod-badge').value,
+        description: document.getElementById('edit-prod-desc').value
+      };
+      await db.collection('products').doc(id).set(productData);
+      await loadAdminData();
+      closeProductModal();
+    }
+
+    async function addNewOffer() {
+      const minQty = Number(document.getElementById('new-offer-qty').value);
+      const bundlePrice = Number(document.getElementById('new-offer-price').value);
+      if (!minQty || !bundlePrice) return alert("Enter valid quantity and price.");
+      const offerId = 'offer_' + Date.now();
+      await db.collection('offers').doc(offerId).set({ minQty, bundlePrice, title: `${minQty} Items Combo Offer` });
+      await loadAdminData();
+    }
+
+    async function deleteOffer(id) {
+      await db.collection('offers').doc(id).delete();
+      await loadAdminData();
+    }
+
+    async function saveStoreSettings() {
+      const settingsData = {
+        storeName: document.getElementById('setting-store-name').value.trim(),
+        logoUrl: document.getElementById('setting-logo').value.trim(),
+        announcementBanner: document.getElementById('setting-banner').value.trim(),
+        whatsappNumber: document.getElementById('setting-whatsapp').value.trim(),
+        footerText: document.getElementById('setting-footer').value.trim()
+      };
+      try {
+        await db.collection('settings').doc('config').set(settingsData, { merge: true });
+        alert("Store settings saved successfully!");
+      } catch (error) {
+        alert("Failed to save settings.");
+      }
+    }
+  </script>
+</body>
+</html>
